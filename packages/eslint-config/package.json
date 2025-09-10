@@ -1,0 +1,32 @@
+{
+  "name": "@repo/eslint-config",
+  "version": "1.0.0",
+  "description": "Shared ESLint configuration for the live sports dashboard monorepo",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "react.js",
+    "node.js"
+  ],
+  "keywords": [
+    "eslint",
+    "config",
+    "typescript",
+    "react",
+    "node"
+  ],
+  "author": "",
+  "license": "ISC",
+  "peerDependencies": {
+    "eslint": "^9.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint-plugin-react": "^7.37.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsx-a11y": "^6.10.0"
+  }
+}
