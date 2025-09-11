@@ -18,14 +18,3 @@ logs/
 .DS_Store
 .cursor/
 
-# lockfiles
-pnpm-lock.yaml
-package-lock.json
-yarn.lock
-bun.lockb
-npm-shrinkwrap.json
-pnpm-workspace.yaml
-pnpm-lock.yaml
-package-lock.json
-yarn.lock
-bun.lockb
