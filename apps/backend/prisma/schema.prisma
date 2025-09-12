@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Match {
+  id        String      @id @default(cuid())
+  teamA     String
+  teamB     String
+  scoreA    Int         @default(0)
+  scoreB    Int         @default(0)
+  status    MatchStatus @default(SCHEDULED)
+  startTime DateTime?
+  endTime   DateTime?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  // Relations
+  polls        Poll[]
+  commentaries Commentary[]
+
+  @@map("matches")
+}
+
+model Poll {
+  id        String   @id @default(cuid())
+  question  String
+  matchId   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  match   Match        @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  options PollOption[]
+  votes   Vote[]
+
+  @@map("polls")
+}
+
+model PollOption {
+  id        String   @id @default(cuid())
+  text      String
+  pollId    String
+  createdAt DateTime @default(now())
+
+  // Relations
+  poll  Poll   @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes Vote[]
+
+  @@map("poll_options")
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  pollId    String
+  optionId  String
+  voterId   String? // Optional: for tracking unique voters
+  createdAt DateTime @default(now())
+
+  // Relations
+  poll   Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  option PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@unique([pollId, voterId]) // Prevent duplicate votes from same voter
+  @@map("votes")
+}
+
+model Commentary {
+  id        String   @id @default(cuid())
+  text      String
+  matchId   String
+  timestamp DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  // Relations
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@map("commentaries")
+}
+
+enum MatchStatus {
+  SCHEDULED
+  LIVE
+  FINISHED
+  CANCELLED
+}
