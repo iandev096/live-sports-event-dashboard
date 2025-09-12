@@ -16,6 +16,8 @@
     "docker:backend:logs": "docker-compose -f docker-compose.dev.yml logs -f backend",
     "docker:backend:shell": "docker-compose -f docker-compose.dev.yml exec backend sh",
     "docker:backend:restart": "docker-compose -f docker-compose.dev.yml restart backend",
+    "db:setup": "docker-compose -f docker-compose.dev.yml up -d postgres && sleep 5 && pnpm --filter backend db:push && pnpm --filter backend db:seed",
+    "db:reset": "docker-compose -f docker-compose.dev.yml down -v && pnpm db:setup",
     "build:frontend": "pnpm --filter frontend build",
     "build:backend": "pnpm --filter backend build",
     "build": "concurrently \"pnpm build:frontend\" \"pnpm build:backend\""
