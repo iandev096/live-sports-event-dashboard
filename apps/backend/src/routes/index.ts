@@ -4,46 +4,48 @@ import matchRoutes from "./matchRoutes";
 import pollRoutes from "./pollRoutes";
 
 export const setupRoutes = (app: Application) => {
+  const API_BASE_URL = process.env.API_BASE_URL || "/api/v1";
+
   // API Documentation endpoint
-  app.get("/api", (req, res) => {
+  app.get(API_BASE_URL, (req, res) => {
     res.json({
       status: "success",
       message: "Sports Dashboard API",
       version: "1.0.0",
       endpoints: {
-        health: "GET /api/health",
-        database: "GET /api/db-test",
+        health: `GET ${API_BASE_URL}/health`,
+        database: `GET ${API_BASE_URL}/db-test`,
         matches: {
-          list: "GET /api/matches",
-          live: "GET /api/matches/live",
-          get: "GET /api/matches/:id",
-          create: "POST /api/matches",
-          update: "PUT /api/matches/:id",
-          delete: "DELETE /api/matches/:id",
+          list: `GET ${API_BASE_URL}/matches`,
+          live: `GET ${API_BASE_URL}/matches/live`,
+          get: `GET ${API_BASE_URL}/matches/:id`,
+          create: `POST ${API_BASE_URL}/matches`,
+          update: `PUT ${API_BASE_URL}/matches/:id`,
+          delete: `DELETE ${API_BASE_URL}/matches/:id`,
         },
         polls: {
-          list: "GET /api/polls",
-          get: "GET /api/polls/:id",
-          results: "GET /api/polls/:id/results",
-          create: "POST /api/polls",
-          vote: "POST /api/polls/:id/vote",
-          update: "PUT /api/polls/:id",
-          delete: "DELETE /api/polls/:id",
+          list: `GET ${API_BASE_URL}/polls`,
+          get: `GET ${API_BASE_URL}/polls/:id`,
+          results: `GET ${API_BASE_URL}/polls/:id/results`,
+          create: `POST ${API_BASE_URL}/polls`,
+          vote: `POST ${API_BASE_URL}/polls/:id/vote`,
+          update: `PUT ${API_BASE_URL}/polls/:id`,
+          delete: `DELETE ${API_BASE_URL}/polls/:id`,
         },
         commentary: {
-          list: "GET /api/commentary",
-          get: "GET /api/commentary/:id",
-          byMatch: "GET /api/commentary/match/:matchId",
-          create: "POST /api/commentary",
-          update: "PUT /api/commentary/:id",
-          delete: "DELETE /api/commentary/:id",
+          list: `GET ${API_BASE_URL}/commentary`,
+          get: `GET ${API_BASE_URL}/commentary/:id`,
+          byMatch: `GET ${API_BASE_URL}/commentary/match/:matchId`,
+          create: `POST ${API_BASE_URL}/commentary`,
+          update: `PUT ${API_BASE_URL}/commentary/:id`,
+          delete: `DELETE ${API_BASE_URL}/commentary/:id`,
         },
       },
     });
   });
 
   // Health check endpoint
-  app.get("/api/health", (req, res) => {
+  app.get(`${API_BASE_URL}/health`, (req, res) => {
     res.json({
       status: "ok",
       timestamp: new Date().toISOString(),
@@ -52,7 +54,7 @@ export const setupRoutes = (app: Application) => {
   });
 
   // Test database connection
-  app.get("/api/db-test", async (req, res) => {
+  app.get(`${API_BASE_URL}/db-test`, async (req, res) => {
     try {
       const { prisma } = await import("../lib/prisma");
       const matchCount = await prisma.match.count();
@@ -71,7 +73,7 @@ export const setupRoutes = (app: Application) => {
   });
 
   // API Routes
-  app.use("/api/matches", matchRoutes);
-  app.use("/api/polls", pollRoutes);
-  app.use("/api/commentary", commentaryRoutes);
+  app.use(`${API_BASE_URL}/matches`, matchRoutes);
+  app.use(`${API_BASE_URL}/polls`, pollRoutes);
+  app.use(`${API_BASE_URL}/commentary`, commentaryRoutes);
 };
