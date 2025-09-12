@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 
-// GET /api/commentary - Get all commentary
+// GET /api/v1/commentary - Get all commentary
 export const getAllCommentary = async (req: Request, res: Response) => {
   try {
     const { matchId, limit = "50", offset = "0" } = req.query;
@@ -48,7 +48,7 @@ export const getAllCommentary = async (req: Request, res: Response) => {
   }
 };
 
-// GET /api/commentary/:id - Get commentary by ID
+// GET /api/v1/commentary/:id - Get commentary by ID
 export const getCommentaryById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -89,7 +89,7 @@ export const getCommentaryById = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/commentary - Create new commentary
+// POST /api/v1/commentary - Create new commentary
 export const createCommentary = async (req: Request, res: Response) => {
   try {
     const { text, matchId, timestamp } = req.body;
@@ -146,7 +146,7 @@ export const createCommentary = async (req: Request, res: Response) => {
   }
 };
 
-// PUT /api/commentary/:id - Update commentary
+// PUT /api/v1/commentary/:id - Update commentary
 export const updateCommentary = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -197,7 +197,7 @@ export const updateCommentary = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE /api/commentary/:id - Delete commentary
+// DELETE /api/v1/commentary/:id - Delete commentary
 export const deleteCommentary = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -231,7 +231,7 @@ export const deleteCommentary = async (req: Request, res: Response) => {
   }
 };
 
-// GET /api/commentary/match/:matchId - Get commentary for specific match
+// GET /api/v1/commentary/match/:matchId - Get commentary for specific match
 export const getCommentaryByMatch = async (req: Request, res: Response) => {
   try {
     const { matchId } = req.params;

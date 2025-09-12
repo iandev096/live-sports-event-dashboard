@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 
-// GET /api/polls - Get all polls
+// GET /api/v1/polls - Get all polls
 export const getAllPolls = async (req: Request, res: Response) => {
   try {
     const { matchId, isActive, limit = "10", offset = "0" } = req.query;
@@ -56,7 +56,7 @@ export const getAllPolls = async (req: Request, res: Response) => {
   }
 };
 
-// GET /api/polls/:id - Get poll by ID
+// GET /api/v1/polls/:id - Get poll by ID
 export const getPollById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -103,7 +103,7 @@ export const getPollById = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/polls - Create new poll
+// POST /api/v1/polls - Create new poll
 export const createPoll = async (req: Request, res: Response) => {
   try {
     const { question, matchId, options } = req.body;
@@ -176,7 +176,7 @@ export const createPoll = async (req: Request, res: Response) => {
   }
 };
 
-// PUT /api/polls/:id - Update poll
+// PUT /api/v1/polls/:id - Update poll
 export const updatePoll = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -233,7 +233,7 @@ export const updatePoll = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE /api/polls/:id - Delete poll
+// DELETE /api/v1/polls/:id - Delete poll
 export const deletePoll = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -267,7 +267,7 @@ export const deletePoll = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/polls/:id/vote - Vote on poll
+// POST /api/v1/polls/:id/vote - Vote on poll
 export const voteOnPoll = async (req: Request, res: Response) => {
   try {
     const { id: pollId } = req.params;
@@ -353,7 +353,7 @@ export const voteOnPoll = async (req: Request, res: Response) => {
   }
 };
 
-// GET /api/polls/:id/results - Get poll results
+// GET /api/v1/polls/:id/results - Get poll results
 export const getPollResults = async (req: Request, res: Response) => {
   try {
     const { id: pollId } = req.params;

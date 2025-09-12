@@ -2,7 +2,7 @@ import { MatchStatus } from "@prisma/client";
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 
-// GET /api/matches - Get all matches
+// GET /api/v1/matches - Get all matches
 export const getAllMatches = async (req: Request, res: Response) => {
   try {
     const { status, limit = "10", offset = "0" } = req.query;
@@ -53,7 +53,7 @@ export const getAllMatches = async (req: Request, res: Response) => {
   }
 };
 
-// GET /api/matches/:id - Get match by ID
+// GET /api/v1/matches/:id - Get match by ID
 export const getMatchById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -97,7 +97,7 @@ export const getMatchById = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/matches - Create new match
+// POST /api/v1/matches - Create new match
 export const createMatch = async (req: Request, res: Response) => {
   try {
     const { teamA, teamB, startTime, status = "SCHEDULED" } = req.body;
@@ -136,7 +136,7 @@ export const createMatch = async (req: Request, res: Response) => {
   }
 };
 
-// PUT /api/matches/:id - Update match
+// PUT /api/v1/matches/:id - Update match
 export const updateMatch = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -198,7 +198,7 @@ export const updateMatch = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE /api/matches/:id - Delete match
+// DELETE /api/v1/matches/:id - Delete match
 export const deleteMatch = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -232,7 +232,7 @@ export const deleteMatch = async (req: Request, res: Response) => {
   }
 };
 
-// GET /api/matches/live - Get live matches
+// GET /api/v1/matches/live - Get live matches
 export const getLiveMatches = async (req: Request, res: Response) => {
   try {
     const matches = await prisma.match.findMany({
