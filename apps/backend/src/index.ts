@@ -3,6 +3,9 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 import { prisma } from "./lib/prisma";
+import { errorHandler, notFoundHandler, setupMiddleware } from "./middleware";
+import { setupRoutes } from "./routes";
+import { setupSocket } from "./socket/socketHandler";
 
 // Load environment variables from root .env file
 dotenv.config({ path: "../../.env" });
@@ -11,56 +14,40 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Allow the frontend to connect
-    methods: ["GET", "POST"],
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
   },
 });
 
 const PORT = process.env.PORT || 3001;
 
-app.get("/api/health", (req, res) => {
-  res.json({ status: "ok" });
-});
+// Setup middleware
+setupMiddleware(app);
 
-// Test database connection
-app.get("/api/db-test", async (req, res) => {
-  try {
-    const matchCount = await prisma.match.count();
-    res.json({
-      status: "connected",
-      matchCount,
-      message: "Database connection successful",
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: "Database connection failed",
-      error: error instanceof Error ? error.message : "Unknown error",
-    });
-  }
-});
+// Setup routes
+setupRoutes(app);
 
-io.on("connection", (socket) => {
-  console.log("A user connected:", socket.id);
+// Setup Socket.IO
+setupSocket(io);
 
-  socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
-  });
-});
+// Error handling
+app.use(errorHandler);
+app.use(notFoundHandler);
 
+// Start server
 server.listen(PORT, () => {
-  console.log(`Backend server is running on http://localhost:${PORT}`);
+  console.log(`🚀 Backend server is running on http://localhost:${PORT}`);
+  console.log(
+    `📊 Database: ${process.env.DATABASE_URL?.split("@")[1] || "Not connected"}`
+  );
 });
 
 // Graceful shutdown
-process.on("SIGINT", async () => {
+const gracefulShutdown = async () => {
   console.log("Shutting down gracefully...");
   await prisma.$disconnect();
   process.exit(0);
-});
+};
 
-process.on("SIGTERM", async () => {
-  console.log("Shutting down gracefully...");
-  await prisma.$disconnect();
-  process.exit(0);
-});
+process.on("SIGINT", gracefulShutdown);
+process.on("SIGTERM", gracefulShutdown);
