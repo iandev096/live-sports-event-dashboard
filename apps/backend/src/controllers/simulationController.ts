@@ -1,6 +1,6 @@
 import { ApiResponse } from "@repo/shared-types";
 import { Request, Response } from "express";
-import { getSimulationManager } from "../socket/socketHandler";
+import { getSimulationManager } from "../socket";
 
 // GET /api/v1/simulations - Get all running simulations
 export const getAllSimulations = async (req: Request, res: Response) => {

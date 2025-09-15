@@ -5,7 +5,7 @@ import { Server } from "socket.io";
 import { prisma } from "./lib/prisma";
 import { errorHandler, notFoundHandler, setupMiddleware } from "./middleware";
 import { setupRoutes } from "./routes";
-import { setupSocket } from "./socket/socketHandler";
+import { setupSocket } from "./socket";
 
 // Load environment variables from root .env file
 dotenv.config({ path: "../../.env" });
