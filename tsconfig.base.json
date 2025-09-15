@@ -21,7 +21,8 @@
     "baseUrl": ".",
     "paths": {
       "@repo/ui": ["./packages/ui/src"],
-      "@repo/eslint-config": ["./packages/eslint-config"]
+      "@repo/eslint-config": ["./packages/eslint-config"],
+      "@repo/shared-types": ["./packages/shared-types/src"]
     }
   },
   "exclude": ["node_modules", "dist", "build", ".vite"]

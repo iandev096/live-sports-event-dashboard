@@ -5,8 +5,14 @@
     "outDir": "./dist",
     "noEmit": false,
     "jsx": "preserve",
-    "types": ["node"]
+    "types": ["node"],
+    "rootDir": "../../",
+    "baseUrl": "../../"
   },
-  "include": ["src/**/*", "prisma/**/*"],
+  "include": [
+    "src/**/*",
+    "prisma/**/*",
+    "../../packages/shared-types/src/**/*"
+  ],
   "exclude": ["node_modules", "dist"]
 }
