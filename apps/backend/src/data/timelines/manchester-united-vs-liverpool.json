@@ -1,0 +1,173 @@
+{
+  "matchId": "man-united-vs-liverpool-2024",
+  "teamA": "Manchester United",
+  "teamB": "Liverpool",
+  "duration": 90,
+  "events": [
+    {
+      "minute": 0,
+      "type": "kickoff",
+      "team": "teamA",
+      "description": "Manchester United kick off the match!",
+      "metadata": {}
+    },
+    {
+      "minute": 2,
+      "type": "commentary",
+      "description": "The atmosphere is electric at Old Trafford! Both teams are looking sharp in the opening minutes.",
+      "metadata": {}
+    },
+    {
+      "minute": 8,
+      "type": "shot",
+      "team": "teamB",
+      "player": "Mohamed Salah",
+      "description": "Salah with an early shot from the edge of the box, but it goes wide!",
+      "metadata": {
+        "shotType": "long-range",
+        "onTarget": false
+      }
+    },
+    {
+      "minute": 15,
+      "type": "commentary",
+      "description": "Liverpool are starting to control possession here. United need to get more of the ball.",
+      "metadata": {}
+    },
+    {
+      "minute": 23,
+      "type": "goal",
+      "team": "teamB",
+      "player": "Mohamed Salah",
+      "description": "GOAL! Salah scores for Liverpool! A brilliant finish from close range!",
+      "metadata": {
+        "assist": "Sadio Mané",
+        "goalType": "open-play"
+      }
+    },
+    {
+      "minute": 25,
+      "type": "commentary",
+      "description": "What a goal! Liverpool take the lead through their Egyptian king. United need to respond quickly.",
+      "metadata": {}
+    },
+    {
+      "minute": 31,
+      "type": "yellow-card",
+      "team": "teamA",
+      "player": "Paul Pogba",
+      "description": "Pogba goes into the book for a late challenge on Henderson.",
+      "metadata": {
+        "reason": "reckless-tackle"
+      }
+    },
+    {
+      "minute": 38,
+      "type": "shot",
+      "team": "teamA",
+      "player": "Marcus Rashford",
+      "description": "Rashford with a powerful shot from distance, but Alisson makes a comfortable save.",
+      "metadata": {
+        "shotType": "long-range",
+        "onTarget": true,
+        "saved": true
+      }
+    },
+    {
+      "minute": 42,
+      "type": "corner",
+      "team": "teamA",
+      "description": "United win a corner. This could be their chance to equalize before half-time.",
+      "metadata": {}
+    },
+    {
+      "minute": 45,
+      "type": "half-time",
+      "description": "Half-time! Liverpool lead 1-0 thanks to Salah's goal. United have work to do in the second half.",
+      "metadata": {}
+    },
+    {
+      "minute": 46,
+      "type": "kickoff",
+      "team": "teamB",
+      "description": "Liverpool kick off the second half!",
+      "metadata": {}
+    },
+    {
+      "minute": 52,
+      "type": "substitution",
+      "team": "teamA",
+      "player": "Fred",
+      "description": "United make their first change: Fred comes on for McTominay.",
+      "metadata": {
+        "substitutedPlayer": "Scott McTominay"
+      }
+    },
+    {
+      "minute": 58,
+      "type": "shot",
+      "team": "teamA",
+      "player": "Bruno Fernandes",
+      "description": "Fernandes with a curling effort from outside the box, but it's just over the bar!",
+      "metadata": {
+        "shotType": "long-range",
+        "onTarget": false
+      }
+    },
+    {
+      "minute": 67,
+      "type": "goal",
+      "team": "teamA",
+      "player": "Marcus Rashford",
+      "description": "GOAL! Rashford equalizes for United! A clinical finish from inside the box!",
+      "metadata": {
+        "assist": "Bruno Fernandes",
+        "goalType": "open-play"
+      }
+    },
+    {
+      "minute": 70,
+      "type": "commentary",
+      "description": "Game on! United are back in it thanks to Rashford. This is turning into a classic!",
+      "metadata": {}
+    },
+    {
+      "minute": 75,
+      "type": "substitution",
+      "team": "teamB",
+      "player": "Diogo Jota",
+      "description": "Liverpool bring on Jota for Mané. Fresh legs for the final 15 minutes.",
+      "metadata": {
+        "substitutedPlayer": "Sadio Mané"
+      }
+    },
+    {
+      "minute": 82,
+      "type": "yellow-card",
+      "team": "teamB",
+      "player": "Virgil van Dijk",
+      "description": "Van Dijk is booked for a foul on Rashford.",
+      "metadata": {
+        "reason": "professional-foul"
+      }
+    },
+    {
+      "minute": 87,
+      "type": "shot",
+      "team": "teamA",
+      "player": "Cristiano Ronaldo",
+      "description": "Ronaldo with a header from a corner, but it's straight at Alisson!",
+      "metadata": {
+        "shotType": "header",
+        "onTarget": true,
+        "saved": true
+      }
+    },
+    {
+      "minute": 90,
+      "type": "full-time",
+      "description": "Full-time! It ends 1-1 between Manchester United and Liverpool. A thrilling match!",
+      "metadata": {}
+    }
+  ]
+}
