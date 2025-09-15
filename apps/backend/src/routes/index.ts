@@ -2,6 +2,7 @@ import { Application } from "express";
 import commentaryRoutes from "./commentaryRoutes";
 import matchRoutes from "./matchRoutes";
 import pollRoutes from "./pollRoutes";
+import simulationRoutes from "./simulationRoutes";
 
 export const setupRoutes = (app: Application) => {
   const API_BASE_URL = process.env.API_BASE_URL || "/api/v1";
@@ -40,6 +41,14 @@ export const setupRoutes = (app: Application) => {
           update: `PUT ${API_BASE_URL}/commentary/:id`,
           delete: `DELETE ${API_BASE_URL}/commentary/:id`,
         },
+        simulations: {
+          list: `GET ${API_BASE_URL}/simulations`,
+          status: `GET ${API_BASE_URL}/simulations/:matchId`,
+          state: `GET ${API_BASE_URL}/simulations/:matchId/state`,
+          start: `POST ${API_BASE_URL}/simulations/:matchId/start`,
+          stop: `POST ${API_BASE_URL}/simulations/:matchId/stop`,
+          stopAll: `POST ${API_BASE_URL}/simulations/stop-all`,
+        },
       },
     });
   });
@@ -76,4 +85,5 @@ export const setupRoutes = (app: Application) => {
   app.use(`${API_BASE_URL}/matches`, matchRoutes);
   app.use(`${API_BASE_URL}/polls`, pollRoutes);
   app.use(`${API_BASE_URL}/commentary`, commentaryRoutes);
+  app.use(`${API_BASE_URL}/simulations`, simulationRoutes);
 };
