@@ -1,3 +1,4 @@
+import { ApiResponse, PaginatedResponse } from "@repo/shared-types";
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 
@@ -36,7 +37,7 @@ export const getAllPolls = async (req: Request, res: Response) => {
 
     const total = await prisma.poll.count({ where });
 
-    res.json({
+    const response: PaginatedResponse = {
       status: "success",
       data: polls,
       pagination: {
@@ -45,14 +46,16 @@ export const getAllPolls = async (req: Request, res: Response) => {
         offset: parseInt(offset as string),
         hasMore: parseInt(offset as string) + polls.length < total,
       },
-    });
+    };
+    res.json(response);
   } catch (error) {
     console.error("Error fetching polls:", error);
-    res.status(500).json({
+    const response: ApiResponse = {
       status: "error",
       message: "Failed to fetch polls",
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    res.status(500).json(response);
   }
 };
 
@@ -83,23 +86,26 @@ export const getPollById = async (req: Request, res: Response) => {
     });
 
     if (!poll) {
-      return res.status(404).json({
+      const response: ApiResponse = {
         status: "error",
         message: "Poll not found",
-      });
+      };
+      return res.status(404).json(response);
     }
 
-    res.json({
+    const response: ApiResponse = {
       status: "success",
       data: poll,
-    });
+    };
+    res.json(response);
   } catch (error) {
     console.error("Error fetching poll:", error);
-    res.status(500).json({
+    const response: ApiResponse = {
       status: "error",
       message: "Failed to fetch poll",
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    res.status(500).json(response);
   }
 };
 
@@ -115,10 +121,11 @@ export const createPoll = async (req: Request, res: Response) => {
       !Array.isArray(options) ||
       options.length < 2
     ) {
-      return res.status(400).json({
+      const response: ApiResponse = {
         status: "error",
         message: "question, matchId, and at least 2 options are required",
-      });
+      };
+      return res.status(400).json(response);
     }
 
     // Verify match exists
@@ -127,10 +134,11 @@ export const createPoll = async (req: Request, res: Response) => {
     });
 
     if (!match) {
-      return res.status(404).json({
+      const response: ApiResponse = {
         status: "error",
         message: "Match not found",
-      });
+      };
+      return res.status(404).json(response);
     }
 
     const poll = await prisma.poll.create({
@@ -162,17 +170,19 @@ export const createPoll = async (req: Request, res: Response) => {
       },
     });
 
-    res.status(201).json({
+    const response: ApiResponse = {
       status: "success",
       data: poll,
-    });
+    };
+    res.status(201).json(response);
   } catch (error) {
     console.error("Error creating poll:", error);
-    res.status(500).json({
+    const response: ApiResponse = {
       status: "error",
       message: "Failed to create poll",
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    res.status(500).json(response);
   }
 };
 
@@ -219,17 +229,19 @@ export const updatePoll = async (req: Request, res: Response) => {
       },
     });
 
-    res.json({
+    const response: ApiResponse = {
       status: "success",
       data: poll,
-    });
+    };
+    res.json(response);
   } catch (error) {
     console.error("Error updating poll:", error);
-    res.status(500).json({
+    const response: ApiResponse = {
       status: "error",
       message: "Failed to update poll",
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    res.status(500).json(response);
   }
 };
 
@@ -253,17 +265,19 @@ export const deletePoll = async (req: Request, res: Response) => {
       where: { id },
     });
 
-    res.json({
+    const response: ApiResponse = {
       status: "success",
       message: "Poll deleted successfully",
-    });
+    };
+    res.json(response);
   } catch (error) {
     console.error("Error deleting poll:", error);
-    res.status(500).json({
+    const response: ApiResponse = {
       status: "error",
       message: "Failed to delete poll",
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    res.status(500).json(response);
   }
 };
 
@@ -274,10 +288,11 @@ export const voteOnPoll = async (req: Request, res: Response) => {
     const { optionId, voterId } = req.body;
 
     if (!optionId) {
-      return res.status(400).json({
+      const response: ApiResponse = {
         status: "error",
         message: "optionId is required",
-      });
+      };
+      return res.status(400).json(response);
     }
 
     // Verify poll exists and is active
@@ -287,26 +302,29 @@ export const voteOnPoll = async (req: Request, res: Response) => {
     });
 
     if (!poll) {
-      return res.status(404).json({
+      const response: ApiResponse = {
         status: "error",
         message: "Poll not found",
-      });
+      };
+      return res.status(404).json(response);
     }
 
     if (!poll.isActive) {
-      return res.status(400).json({
+      const response: ApiResponse = {
         status: "error",
         message: "Poll is not active",
-      });
+      };
+      return res.status(400).json(response);
     }
 
     // Verify option belongs to poll
     const option = poll.options.find((opt) => opt.id === optionId);
     if (!option) {
-      return res.status(400).json({
+      const response: ApiResponse = {
         status: "error",
         message: "Invalid option for this poll",
-      });
+      };
+      return res.status(400).json(response);
     }
 
     // Check for existing vote from same voter (if voterId provided)
@@ -321,10 +339,11 @@ export const voteOnPoll = async (req: Request, res: Response) => {
       });
 
       if (existingVote) {
-        return res.status(400).json({
+        const response: ApiResponse = {
           status: "error",
           message: "You have already voted on this poll",
-        });
+        };
+        return res.status(400).json(response);
       }
     }
 
@@ -339,17 +358,19 @@ export const voteOnPoll = async (req: Request, res: Response) => {
       },
     });
 
-    res.status(201).json({
+    const response: ApiResponse = {
       status: "success",
       data: vote,
-    });
+    };
+    res.status(201).json(response);
   } catch (error) {
     console.error("Error voting on poll:", error);
-    res.status(500).json({
+    const response: ApiResponse = {
       status: "error",
       message: "Failed to vote on poll",
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    res.status(500).json(response);
   }
 };
 
@@ -370,10 +391,11 @@ export const getPollResults = async (req: Request, res: Response) => {
     });
 
     if (!poll) {
-      return res.status(404).json({
+      const response: ApiResponse = {
         status: "error",
         message: "Poll not found",
-      });
+      };
+      return res.status(404).json(response);
     }
 
     const results = poll.options.map((option) => ({
@@ -398,7 +420,7 @@ export const getPollResults = async (req: Request, res: Response) => {
       0
     );
 
-    res.json({
+    const response: ApiResponse = {
       status: "success",
       data: {
         poll: {
@@ -410,13 +432,15 @@ export const getPollResults = async (req: Request, res: Response) => {
         results,
         totalVotes,
       },
-    });
+    };
+    res.json(response);
   } catch (error) {
     console.error("Error fetching poll results:", error);
-    res.status(500).json({
+    const response: ApiResponse = {
       status: "error",
       message: "Failed to fetch poll results",
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    res.status(500).json(response);
   }
 };

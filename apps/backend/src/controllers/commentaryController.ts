@@ -1,3 +1,4 @@
+import { ApiResponse, PaginatedResponse } from "@repo/shared-types";
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 
@@ -28,7 +29,7 @@ export const getAllCommentary = async (req: Request, res: Response) => {
 
     const total = await prisma.commentary.count({ where });
 
-    res.json({
+    const response: PaginatedResponse = {
       status: "success",
       data: commentary,
       pagination: {
@@ -37,14 +38,16 @@ export const getAllCommentary = async (req: Request, res: Response) => {
         offset: parseInt(offset as string),
         hasMore: parseInt(offset as string) + commentary.length < total,
       },
-    });
+    };
+    res.json(response);
   } catch (error) {
     console.error("Error fetching commentary:", error);
-    res.status(500).json({
+    const response: ApiResponse = {
       status: "error",
       message: "Failed to fetch commentary",
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    res.status(500).json(response);
   }
 };
 
@@ -69,23 +72,26 @@ export const getCommentaryById = async (req: Request, res: Response) => {
     });
 
     if (!commentary) {
-      return res.status(404).json({
+      const response: ApiResponse = {
         status: "error",
         message: "Commentary not found",
-      });
+      };
+      return res.status(404).json(response);
     }
 
-    res.json({
+    const response: ApiResponse = {
       status: "success",
       data: commentary,
-    });
+    };
+    res.json(response);
   } catch (error) {
     console.error("Error fetching commentary:", error);
-    res.status(500).json({
+    const response: ApiResponse = {
       status: "error",
       message: "Failed to fetch commentary",
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    res.status(500).json(response);
   }
 };
 
@@ -95,10 +101,11 @@ export const createCommentary = async (req: Request, res: Response) => {
     const { text, matchId, timestamp } = req.body;
 
     if (!text || !matchId) {
-      return res.status(400).json({
+      const response: ApiResponse = {
         status: "error",
         message: "text and matchId are required",
-      });
+      };
+      return res.status(400).json(response);
     }
 
     // Verify match exists
@@ -107,10 +114,11 @@ export const createCommentary = async (req: Request, res: Response) => {
     });
 
     if (!match) {
-      return res.status(404).json({
+      const response: ApiResponse = {
         status: "error",
         message: "Match not found",
-      });
+      };
+      return res.status(404).json(response);
     }
 
     const commentary = await prisma.commentary.create({
@@ -132,17 +140,19 @@ export const createCommentary = async (req: Request, res: Response) => {
       },
     });
 
-    res.status(201).json({
+    const response: ApiResponse = {
       status: "success",
       data: commentary,
-    });
+    };
+    res.status(201).json(response);
   } catch (error) {
     console.error("Error creating commentary:", error);
-    res.status(500).json({
+    const response: ApiResponse = {
       status: "error",
       message: "Failed to create commentary",
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    res.status(500).json(response);
   }
 };
 
@@ -157,10 +167,11 @@ export const updateCommentary = async (req: Request, res: Response) => {
     });
 
     if (!existingCommentary) {
-      return res.status(404).json({
+      const response: ApiResponse = {
         status: "error",
         message: "Commentary not found",
-      });
+      };
+      return res.status(404).json(response);
     }
 
     const updateData: any = {};
@@ -183,17 +194,19 @@ export const updateCommentary = async (req: Request, res: Response) => {
       },
     });
 
-    res.json({
+    const response: ApiResponse = {
       status: "success",
       data: commentary,
-    });
+    };
+    res.json(response);
   } catch (error) {
     console.error("Error updating commentary:", error);
-    res.status(500).json({
+    const response: ApiResponse = {
       status: "error",
       message: "Failed to update commentary",
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    res.status(500).json(response);
   }
 };
 
@@ -207,27 +220,30 @@ export const deleteCommentary = async (req: Request, res: Response) => {
     });
 
     if (!existingCommentary) {
-      return res.status(404).json({
+      const response: ApiResponse = {
         status: "error",
         message: "Commentary not found",
-      });
+      };
+      return res.status(404).json(response);
     }
 
     await prisma.commentary.delete({
       where: { id },
     });
 
-    res.json({
+    const response: ApiResponse = {
       status: "success",
       message: "Commentary deleted successfully",
-    });
+    };
+    res.json(response);
   } catch (error) {
     console.error("Error deleting commentary:", error);
-    res.status(500).json({
+    const response: ApiResponse = {
       status: "error",
       message: "Failed to delete commentary",
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    res.status(500).json(response);
   }
 };
 
@@ -243,10 +259,11 @@ export const getCommentaryByMatch = async (req: Request, res: Response) => {
     });
 
     if (!match) {
-      return res.status(404).json({
+      const response: ApiResponse = {
         status: "error",
         message: "Match not found",
-      });
+      };
+      return res.status(404).json(response);
     }
 
     const commentary = await prisma.commentary.findMany({
@@ -258,7 +275,7 @@ export const getCommentaryByMatch = async (req: Request, res: Response) => {
 
     const total = await prisma.commentary.count({ where: { matchId } });
 
-    res.json({
+    const response: PaginatedResponse = {
       status: "success",
       data: commentary,
       pagination: {
@@ -267,13 +284,15 @@ export const getCommentaryByMatch = async (req: Request, res: Response) => {
         offset: parseInt(offset as string),
         hasMore: parseInt(offset as string) + commentary.length < total,
       },
-    });
+    };
+    res.json(response);
   } catch (error) {
     console.error("Error fetching match commentary:", error);
-    res.status(500).json({
+    const response: ApiResponse = {
       status: "error",
       message: "Failed to fetch match commentary",
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    res.status(500).json(response);
   }
 };

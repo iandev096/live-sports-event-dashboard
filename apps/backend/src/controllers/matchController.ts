@@ -1,4 +1,5 @@
 import { MatchStatus } from "@prisma/client";
+import { ApiResponse, PaginatedResponse } from "@repo/shared-types";
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 
@@ -33,7 +34,7 @@ export const getAllMatches = async (req: Request, res: Response) => {
 
     const total = await prisma.match.count({ where });
 
-    res.json({
+    const response: PaginatedResponse = {
       status: "success",
       data: matches,
       pagination: {
@@ -42,14 +43,16 @@ export const getAllMatches = async (req: Request, res: Response) => {
         offset: parseInt(offset as string),
         hasMore: parseInt(offset as string) + matches.length < total,
       },
-    });
+    };
+    res.json(response);
   } catch (error) {
     console.error("Error fetching matches:", error);
-    res.status(500).json({
+    const response: ApiResponse = {
       status: "error",
       message: "Failed to fetch matches",
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    res.status(500).json(response);
   }
 };
 
@@ -77,23 +80,26 @@ export const getMatchById = async (req: Request, res: Response) => {
     });
 
     if (!match) {
-      return res.status(404).json({
+      const response: ApiResponse = {
         status: "error",
         message: "Match not found",
-      });
+      };
+      return res.status(404).json(response);
     }
 
-    res.json({
+    const response: ApiResponse = {
       status: "success",
       data: match,
-    });
+    };
+    res.json(response);
   } catch (error) {
     console.error("Error fetching match:", error);
-    res.status(500).json({
+    const response: ApiResponse = {
       status: "error",
       message: "Failed to fetch match",
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    res.status(500).json(response);
   }
 };
 
@@ -103,10 +109,11 @@ export const createMatch = async (req: Request, res: Response) => {
     const { teamA, teamB, startTime, status = "SCHEDULED" } = req.body;
 
     if (!teamA || !teamB) {
-      return res.status(400).json({
+      const response: ApiResponse = {
         status: "error",
         message: "teamA and teamB are required",
-      });
+      };
+      return res.status(400).json(response);
     }
 
     const match = await prisma.match.create({
@@ -122,17 +129,19 @@ export const createMatch = async (req: Request, res: Response) => {
       },
     });
 
-    res.status(201).json({
+    const response: ApiResponse = {
       status: "success",
       data: match,
-    });
+    };
+    res.status(201).json(response);
   } catch (error) {
     console.error("Error creating match:", error);
-    res.status(500).json({
+    const response: ApiResponse = {
       status: "error",
       message: "Failed to create match",
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    res.status(500).json(response);
   }
 };
 
@@ -148,10 +157,11 @@ export const updateMatch = async (req: Request, res: Response) => {
     });
 
     if (!existingMatch) {
-      return res.status(404).json({
+      const response: ApiResponse = {
         status: "error",
         message: "Match not found",
-      });
+      };
+      return res.status(404).json(response);
     }
 
     const updateData: any = {};
@@ -184,17 +194,19 @@ export const updateMatch = async (req: Request, res: Response) => {
       },
     });
 
-    res.json({
+    const response: ApiResponse = {
       status: "success",
       data: match,
-    });
+    };
+    res.json(response);
   } catch (error) {
     console.error("Error updating match:", error);
-    res.status(500).json({
+    const response: ApiResponse = {
       status: "error",
       message: "Failed to update match",
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    res.status(500).json(response);
   }
 };
 
@@ -208,27 +220,30 @@ export const deleteMatch = async (req: Request, res: Response) => {
     });
 
     if (!existingMatch) {
-      return res.status(404).json({
+      const response: ApiResponse = {
         status: "error",
         message: "Match not found",
-      });
+      };
+      return res.status(404).json(response);
     }
 
     await prisma.match.delete({
       where: { id },
     });
 
-    res.json({
+    const response: ApiResponse = {
       status: "success",
       message: "Match deleted successfully",
-    });
+    };
+    res.json(response);
   } catch (error) {
     console.error("Error deleting match:", error);
-    res.status(500).json({
+    const response: ApiResponse = {
       status: "error",
       message: "Failed to delete match",
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    res.status(500).json(response);
   }
 };
 
@@ -255,16 +270,18 @@ export const getLiveMatches = async (req: Request, res: Response) => {
       orderBy: { startTime: "desc" },
     });
 
-    res.json({
+    const response: ApiResponse = {
       status: "success",
       data: matches,
-    });
+    };
+    res.json(response);
   } catch (error) {
     console.error("Error fetching live matches:", error);
-    res.status(500).json({
+    const response: ApiResponse = {
       status: "error",
       message: "Failed to fetch live matches",
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    res.status(500).json(response);
   }
 };
