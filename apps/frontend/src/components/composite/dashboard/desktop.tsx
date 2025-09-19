@@ -1,4 +1,5 @@
 import { matchEvents, teamAEvents, teamBEvents } from "@/mock/match-events";
+import { mockMatchTimeline } from "@/mock/match-timeline";
 import { mockPoll } from "@/mock/poll-data";
 import ActivePoll from "../active-poll";
 import EventsFeed from "../events-feed";
@@ -25,7 +26,11 @@ function DesktopView() {
           className="grid grid-cols-3 gap-4 *:h-[calc(100dvh-230px)] overflow-hidden"
         >
           <section id="team-a" className="flex flex-col gap-4">
-            <TeamCard teamName="Manchester United" teamScore={0} />
+            <TeamCard
+              teamName={mockMatchTimeline.teamA}
+              teamScore={0}
+              teamLogo={`https://api.dicebear.com/7.x/identicon/svg?seed=${mockMatchTimeline.teamA}`}
+            />
             <TeamEvents events={teamAEvents} className="flex-1" />
           </section>
           <section id="poll-general-commentary" className="flex flex-col gap-4">
@@ -39,7 +44,11 @@ function DesktopView() {
             />
           </section>
           <section id="team-b" className="flex flex-col gap-4">
-            <TeamCard teamName="Liverpool" teamScore={0} />
+            <TeamCard
+              teamName={mockMatchTimeline.teamB}
+              teamScore={0}
+              teamLogo={`https://api.dicebear.com/7.x/identicon/svg?seed=${mockMatchTimeline.teamB}`}
+            />
             <TeamEvents events={teamBEvents} className="flex-1" />
           </section>
         </section>

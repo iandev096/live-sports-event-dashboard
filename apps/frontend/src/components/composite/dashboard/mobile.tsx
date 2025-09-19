@@ -60,10 +60,18 @@ function MobileView() {
           className="grid grid-cols-2 gap-4 sticky top-0 z-10 bg-white dark:bg-slate-950 py-4"
         >
           <section id="team-a-mobile">
-            <TeamCard teamName={mockMatchTimeline.teamA} teamScore={0} />
+            <TeamCard
+              teamName={mockMatchTimeline.teamA}
+              teamScore={0}
+              teamLogo="https://api.dicebear.com/7.x/identicon/svg?seed=Man"
+            />
           </section>
           <section id="team-b-mobile">
-            <TeamCard teamName={mockMatchTimeline.teamB} teamScore={0} />
+            <TeamCard
+              teamName={mockMatchTimeline.teamB}
+              teamScore={0}
+              teamLogo="https://api.dicebear.com/7.x/identicon/svg?seed=Liv"
+            />
           </section>
         </section>
         <section id="commentary-mobile" className="z-1">
