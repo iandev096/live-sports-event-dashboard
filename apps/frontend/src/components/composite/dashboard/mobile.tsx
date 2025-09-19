@@ -63,14 +63,14 @@ function MobileView() {
             <TeamCard
               teamName={mockMatchTimeline.teamA}
               teamScore={0}
-              teamLogo="https://api.dicebear.com/7.x/identicon/svg?seed=Man"
+              teamLogo={`https://api.dicebear.com/7.x/identicon/svg?seed=${mockMatchTimeline.teamA}`}
             />
           </section>
           <section id="team-b-mobile">
             <TeamCard
               teamName={mockMatchTimeline.teamB}
               teamScore={0}
-              teamLogo="https://api.dicebear.com/7.x/identicon/svg?seed=Liv"
+              teamLogo={`https://api.dicebear.com/7.x/identicon/svg?seed=${mockMatchTimeline.teamB}`}
             />
           </section>
         </section>
