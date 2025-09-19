@@ -43,8 +43,10 @@ export type EventType =
   | "corner"
   | "free-kick"
   | "penalty"
+  | "penalties"
   | "half-time"
   | "full-time"
+  | "extra-time"
   | "commentary";
 
 export interface MatchTimeline {
