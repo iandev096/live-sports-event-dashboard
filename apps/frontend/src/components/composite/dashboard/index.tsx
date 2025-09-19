@@ -3,9 +3,9 @@ import DesktopView from "./desktop";
 import MobileView from "./mobile";
 
 function Dashboard() {
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isNotDesktop = useMediaQuery("(max-width: 1024px)");
 
-  if (isMobile) {
+  if (isNotDesktop) {
     return <MobileView />;
   }
 
