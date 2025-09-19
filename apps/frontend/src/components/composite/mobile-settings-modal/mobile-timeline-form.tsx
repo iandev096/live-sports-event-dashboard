@@ -1,29 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Form } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { mockMatchTimeline } from "@/mock/match-timeline";
 import { ArrowLeft, ArrowRight, List, Plus, Save, Users } from "lucide-react";
 import { useState } from "react";
-import { EventEditForm } from "../shared/event-edit-form";
-import { EventView } from "../shared/event-view";
+import { EventsList } from "../shared/events-list";
 import { NewEventForm } from "../shared/new-event-form";
+import { TimelineFormGeneral } from "../shared/timeline-form-general";
 import { type TimelineFormProps } from "../shared/timeline-form-types";
 import { useTimelineForm } from "../shared/useTimelineForm";
 
@@ -107,65 +90,7 @@ export function MobileTimelineForm({
               className="h-full m-0 p-2 pt-0 data-[state=active]:animate-in data-[state=active]:fade-in-0 data-[state=active]:slide-in-from-right-1/2 data-[state=inactive]:animate-out data-[state=inactive]:fade-out-0 data-[state=inactive]:slide-out-to-left-1/2 transition-all duration-300 ease-in-out"
             >
               <div className="space-y-4">
-                <div className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="teamA"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Team A</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Team A name" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="teamB"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Team B</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Team B name" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="matchType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Match Type</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select match type" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="standard">
-                              Standard (90 min)
-                            </SelectItem>
-                            <SelectItem value="extra-time">
-                              Extra Time (120 min)
-                            </SelectItem>
-                            <SelectItem value="penalties">
-                              Penalties (125 min)
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <TimelineFormGeneral.Mobile form={form} />
               </div>
             </TabsContent>
 
@@ -193,31 +118,17 @@ export function MobileTimelineForm({
                   </h3>
                 </div>
 
-                <ScrollArea className="h-104">
-                  <div className="space-y-2">
-                    {sortedEvents.map((event, index) => (
-                      <Card key={index} className="p-3">
-                        {editingEvent === index ? (
-                          <EventEditForm.Mobile
-                            event={event}
-                            editForm={editForm}
-                            setEditForm={setEditForm}
-                            isConstantEvent={isConstantEvent}
-                            onSave={saveEdit}
-                            onCancel={cancelEditing}
-                          />
-                        ) : (
-                          <EventView.Mobile
-                            event={event}
-                            isConstantEvent={isConstantEvent}
-                            onEdit={() => startEditing(index)}
-                            onDelete={() => deleteEvent(index)}
-                          />
-                        )}
-                      </Card>
-                    ))}
-                  </div>
-                </ScrollArea>
+                <EventsList.Mobile
+                  events={sortedEvents}
+                  editingEvent={editingEvent}
+                  editForm={editForm}
+                  setEditForm={setEditForm}
+                  isConstantEvent={isConstantEvent}
+                  onSave={saveEdit}
+                  onCancel={cancelEditing}
+                  onEdit={startEditing}
+                  onDelete={deleteEvent}
+                />
               </div>
             </TabsContent>
           </div>

@@ -1,6 +1,6 @@
 import type { EventType, MatchEvent, MatchTimeline } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   CONSTANT_EVENTS,
@@ -17,6 +17,10 @@ export function useTimelineForm({
   initialTimeline,
   onSave,
 }: UseTimelineFormProps) {
+  // Use ref to store the latest onSave callback
+  const onSaveRef = useRef(onSave);
+  onSaveRef.current = onSave;
+
   const [newEvent, setNewEvent] = useState<Partial<MatchEvent>>({
     minute: 0,
     type: "commentary",
@@ -42,13 +46,16 @@ export function useTimelineForm({
   const watchMatchType = form.watch("matchType");
   const events = form.watch("events");
 
-  const isConstantEvent = (eventType: string) => {
-    return CONSTANT_EVENTS[
-      watchMatchType as keyof typeof CONSTANT_EVENTS
-    ].includes(eventType);
-  };
+  const isConstantEvent = useCallback(
+    (eventType: string) => {
+      return CONSTANT_EVENTS[
+        watchMatchType as keyof typeof CONSTANT_EVENTS
+      ].includes(eventType);
+    },
+    [watchMatchType]
+  );
 
-  const addEvent = () => {
+  const addEvent = useCallback(() => {
     if (
       newEvent.description &&
       newEvent.minute !== undefined &&
@@ -66,30 +73,36 @@ export function useTimelineForm({
       form.setValue("events", [...currentEvents, eventToAdd]);
       setNewEvent({ minute: 0, type: "commentary", description: "" });
     }
-  };
+  }, [newEvent, form]);
 
-  const deleteEvent = (index: number) => {
-    const currentEvents = form.getValues("events");
-    currentEvents.splice(index, 1);
-    form.setValue("events", currentEvents);
-  };
+  const deleteEvent = useCallback(
+    (index: number) => {
+      const currentEvents = form.getValues("events");
+      currentEvents.splice(index, 1);
+      form.setValue("events", currentEvents);
+    },
+    [form]
+  );
 
-  const startEditing = (index: number) => {
-    const sortedEvents = [...events].sort((a, b) => a.minute - b.minute);
-    const event = sortedEvents[index];
-    setEditingEvent(index);
-    setEditForm({
-      description: event.description,
-      metadata: event.metadata ? JSON.stringify(event.metadata, null, 2) : "",
-    });
-  };
+  const startEditing = useCallback(
+    (index: number) => {
+      const sortedEvents = [...events].sort((a, b) => a.minute - b.minute);
+      const event = sortedEvents[index];
+      setEditingEvent(index);
+      setEditForm({
+        description: event.description,
+        metadata: event.metadata ? JSON.stringify(event.metadata, null, 2) : "",
+      });
+    },
+    [events, setEditForm]
+  );
 
-  const cancelEditing = () => {
+  const cancelEditing = useCallback(() => {
     setEditingEvent(null);
     setEditForm({ description: "", metadata: "" });
-  };
+  }, [setEditForm]);
 
-  const saveEdit = () => {
+  const saveEdit = useCallback(() => {
     if (editingEvent === null) return;
 
     const currentEvents = form.getValues("events");
@@ -119,23 +132,26 @@ export function useTimelineForm({
 
     setEditingEvent(null);
     setEditForm({ description: "", metadata: "" });
-  };
+  }, [editingEvent, editForm, form, setEditForm]);
 
-  const handleSave = (data: TimelineFormData) => {
-    const timeline: MatchTimeline = {
-      matchId: data.matchId,
-      teamA: data.teamA,
-      teamB: data.teamB,
-      events: data.events.sort((a, b) => a.minute - b.minute),
-      duration:
-        data.matchType === "penalties"
-          ? 125
-          : data.matchType === "extra-time"
-          ? 120
-          : 90,
-    };
-    onSave(timeline);
-  };
+  const handleSave = useCallback(
+    (data: TimelineFormData) => {
+      const timeline: MatchTimeline = {
+        matchId: data.matchId,
+        teamA: data.teamA,
+        teamB: data.teamB,
+        events: data.events.sort((a, b) => a.minute - b.minute),
+        duration:
+          data.matchType === "penalties"
+            ? 125
+            : data.matchType === "extra-time"
+            ? 120
+            : 90,
+      };
+      onSaveRef.current(timeline);
+    },
+    [] // Empty deps - use ref to avoid re-renders
+  );
 
   return {
     // Form state
