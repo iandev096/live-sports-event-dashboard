@@ -39,12 +39,14 @@ function EventsFeed({
             <div className="sr-only">Scroll up to see more</div>
           </div>
         )}
-        {events.map((event) => (
-          <EventsFeed.Item
-            key={event.minute + event.description}
-            event={event}
-          />
-        ))}
+        {events
+          .sort((a, b) => b.minute - a.minute)
+          .map((event) => (
+            <EventsFeed.Item
+              key={event.minute + event.description}
+              event={event}
+            />
+          ))}
         {!hideScrollIndicators && (
           <div
             role="presentation"
