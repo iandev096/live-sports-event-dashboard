@@ -33,7 +33,7 @@ function TeamEventItem({
               <Badge
                 variant={getEventBadgeVariant(type)}
                 className={`text-xs ${
-                  isImportantEvent(type) ? "ring-2 ring-current" : ""
+                  isImportantEvent(type) ? "ring-2 ring-current/50" : ""
                 }`}
               >
                 {getEventTypeLabel(type)}
