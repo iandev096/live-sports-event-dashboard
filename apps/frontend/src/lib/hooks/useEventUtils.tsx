@@ -113,44 +113,24 @@ export const useEventUtils = () => {
     }
   };
 
-  const getEventPriority = (eventType: EventType) => {
-    switch (eventType) {
-      case "goal":
-        return 1; // Highest priority
-      case "red-card":
-        return 2;
-      case "penalty":
-      case "penalties":
-        return 3;
-      case "yellow-card":
-        return 4;
-      case "substitution":
-        return 5;
-      case "shot":
-      case "save":
-        return 6;
-      case "corner":
-      case "free-kick":
-        return 7;
-      case "kickoff":
-      case "half-time":
-      case "full-time":
-      case "extra-time":
-        return 8;
-      case "commentary":
-        return 9; // Lowest priority
-      default:
-        return 10;
-    }
-  };
-
   const isImportantEvent = (eventType: EventType) => {
     return ["goal", "red-card", "penalty", "penalties"].includes(eventType);
   };
 
   const getEventAnimation = (eventType: EventType) => {
     if (isImportantEvent(eventType)) {
-      return "animate-pulse";
+      switch (eventType) {
+        case "goal":
+          return "animate-event-glow-goal";
+        case "red-card":
+          return "animate-event-glow-red-card";
+        case "penalty":
+          return "animate-event-glow-penalty";
+        case "penalties":
+          return "animate-event-glow-penalties";
+        default:
+          return "animate-event-highlight";
+      }
     }
     return "";
   };
@@ -160,7 +140,6 @@ export const useEventUtils = () => {
     getEventColor,
     getEventBadgeVariant,
     getEventTypeLabel,
-    getEventPriority,
     isImportantEvent,
     getEventAnimation,
   };
