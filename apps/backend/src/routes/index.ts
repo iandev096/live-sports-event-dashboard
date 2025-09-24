@@ -1,8 +1,8 @@
 import { Application } from "express";
-import commentaryRoutes from "./commentaryRoutes";
 import matchRoutes from "./matchRoutes";
 import pollRoutes from "./pollRoutes";
 import simulationRoutes from "./simulationRoutes";
+import timelineRoutes from "./timelineRoutes";
 
 export const setupRoutes = (app: Application) => {
   const API_BASE_URL = process.env.API_BASE_URL || "/api/v1";
@@ -33,13 +33,11 @@ export const setupRoutes = (app: Application) => {
           update: `PUT ${API_BASE_URL}/polls/:id`,
           delete: `DELETE ${API_BASE_URL}/polls/:id`,
         },
-        commentary: {
-          list: `GET ${API_BASE_URL}/commentary`,
-          get: `GET ${API_BASE_URL}/commentary/:id`,
-          byMatch: `GET ${API_BASE_URL}/commentary/match/:matchId`,
-          create: `POST ${API_BASE_URL}/commentary`,
-          update: `PUT ${API_BASE_URL}/commentary/:id`,
-          delete: `DELETE ${API_BASE_URL}/commentary/:id`,
+        timelines: {
+          base: `GET ${API_BASE_URL}/timelines/base/:matchId`,
+          user: `GET ${API_BASE_URL}/timelines/user/:matchId`,
+          save: `POST ${API_BASE_URL}/timelines/user/:matchId`,
+          delete: `DELETE ${API_BASE_URL}/timelines/user/:matchId`,
         },
         simulations: {
           list: `GET ${API_BASE_URL}/simulations`,
@@ -84,6 +82,6 @@ export const setupRoutes = (app: Application) => {
   // API Routes
   app.use(`${API_BASE_URL}/matches`, matchRoutes);
   app.use(`${API_BASE_URL}/polls`, pollRoutes);
-  app.use(`${API_BASE_URL}/commentary`, commentaryRoutes);
+  app.use(`${API_BASE_URL}/timelines`, timelineRoutes);
   app.use(`${API_BASE_URL}/simulations`, simulationRoutes);
 };
