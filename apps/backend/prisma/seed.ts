@@ -29,26 +29,12 @@ async function main() {
       isActive: true,
       options: {
         create: [
-          { text: "Manchester United" },
-          { text: "Liverpool" },
+          { text: match.teamA },
+          { text: match.teamB },
           { text: "Draw" },
         ],
       },
     },
-  });
-
-  // Create some sample commentary
-  await prisma.commentary.createMany({
-    data: [
-      {
-        text: "Welcome to the live coverage of Manchester United vs Liverpool!",
-        matchId: match.id,
-      },
-      {
-        text: "The match is scheduled to start in 24 hours.",
-        matchId: match.id,
-      },
-    ],
   });
 
   console.log("✅ Database seeded successfully!");
