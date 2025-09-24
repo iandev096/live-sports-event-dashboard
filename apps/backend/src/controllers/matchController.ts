@@ -22,10 +22,6 @@ export const getAllMatches = async (req: Request, res: Response) => {
             },
           },
         },
-        commentaries: {
-          orderBy: { timestamp: "desc" },
-          take: 5, // Get latest 5 commentaries
-        },
       },
       orderBy: { startTime: "desc" },
       take: parseInt(limit as string),
@@ -72,9 +68,6 @@ export const getMatchById = async (req: Request, res: Response) => {
               },
             },
           },
-        },
-        commentaries: {
-          orderBy: { timestamp: "desc" },
         },
       },
     });
@@ -125,7 +118,6 @@ export const createMatch = async (req: Request, res: Response) => {
       },
       include: {
         polls: true,
-        commentaries: true,
       },
     });
 
@@ -187,9 +179,6 @@ export const updateMatch = async (req: Request, res: Response) => {
               },
             },
           },
-        },
-        commentaries: {
-          orderBy: { timestamp: "desc" },
         },
       },
     });
@@ -261,10 +250,6 @@ export const getLiveMatches = async (req: Request, res: Response) => {
               },
             },
           },
-        },
-        commentaries: {
-          orderBy: { timestamp: "desc" },
-          take: 10,
         },
       },
       orderBy: { startTime: "desc" },
