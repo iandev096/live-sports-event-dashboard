@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import ActivePoll from "../active-poll";
 import ConnectionStatus from "../connection-status";
 import EventsFeed from "../events-feed";
-import MatchInfoInline from "../match-info/inline";
+import MatchInfoInline from "../match-info";
 import { ModeToggle } from "../mode-toggle";
 import ShareSimulationButton from "../share-simulation-button";
 import SimulationControls from "../simulation-controls";

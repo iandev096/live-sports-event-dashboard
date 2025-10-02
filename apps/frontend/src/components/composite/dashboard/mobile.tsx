@@ -4,7 +4,7 @@ import type { MatchTimeline } from "@/types";
 import { useState } from "react";
 import ConnectionStatus from "../connection-status";
 import EventsFeed from "../events-feed";
-import MatchInfoInline from "../match-info/inline";
+import MatchInfoInline from "../match-info";
 import { MobileSettingsModal } from "../mobile-settings-modal";
 import { ModeToggle } from "../mode-toggle";
 import { PollDialog } from "../poll-dialog";
