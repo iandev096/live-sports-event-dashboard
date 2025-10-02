@@ -3,6 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import type { MatchEvent } from "@/types";
 import { MessageSquare } from "lucide-react";
+import { AnimatePresence } from "motion/react";
 import EventFeedItem from "./event-feed-item";
 
 type EventFeedProps = {
@@ -39,14 +40,16 @@ function EventsFeed({
             <div className="sr-only">Scroll up to see more</div>
           </div>
         )}
-        {events
-          .sort((a, b) => b.minute - a.minute)
-          .map((event) => (
-            <EventsFeed.Item
-              key={event.minute + event.description}
-              event={event}
-            />
-          ))}
+        <AnimatePresence mode="popLayout">
+          {events
+            .sort((a, b) => b.minute - a.minute)
+            .map((event) => (
+              <EventsFeed.Item
+                key={event.minute + event.description}
+                event={event}
+              />
+            ))}
+        </AnimatePresence>
         {!hideScrollIndicators && (
           <div
             role="presentation"
