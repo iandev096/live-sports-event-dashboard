@@ -1,13 +1,16 @@
 import { MatchState, SimulationConfig } from "@repo/shared-types";
 import { Server } from "socket.io";
+import { PollManager } from "./pollManager";
 import { MatchSimulationEngine } from "./simulationEngine";
 
 export class SimulationManager {
   private simulations: Map<string, MatchSimulationEngine> = new Map();
   private io: Server;
+  private pollManager: PollManager;
 
-  constructor(io: Server) {
+  constructor(io: Server, pollManager: PollManager) {
     this.io = io;
+    this.pollManager = pollManager;
   }
 
   /**
@@ -41,12 +44,85 @@ export class SimulationManager {
       // Start simulation
       simulation.startSimulation();
 
+      // Create poll for the match
+      this.pollManager.createPoll(matchId, teamA, teamB);
+
       console.log(
         `Started simulation for match ${matchId}: ${teamA} vs ${teamB}`
       );
       return true;
     } catch (error) {
       console.error(`Failed to start simulation for match ${matchId}:`, error);
+      return false;
+    }
+  }
+
+  /**
+   * Pause a simulation for a specific match
+   */
+  public pauseSimulation(matchId: string): boolean {
+    const simulation = this.simulations.get(matchId);
+
+    if (!simulation) {
+      console.log(`No simulation found for match ${matchId}`);
+      return false;
+    }
+
+    try {
+      simulation.pauseSimulation();
+      console.log(`Paused simulation for match ${matchId}`);
+      return true;
+    } catch (error) {
+      console.error(`Failed to pause simulation for match ${matchId}:`, error);
+      return false;
+    }
+  }
+
+  /**
+   * Resume a simulation for a specific match
+   */
+  public resumeSimulation(matchId: string): boolean {
+    const simulation = this.simulations.get(matchId);
+
+    if (!simulation) {
+      console.log(`No simulation found for match ${matchId}`);
+      return false;
+    }
+
+    try {
+      simulation.resumeSimulation();
+      console.log(`Resumed simulation for match ${matchId}`);
+      return true;
+    } catch (error) {
+      console.error(`Failed to resume simulation for match ${matchId}:`, error);
+      return false;
+    }
+  }
+
+  /**
+   * Reset a simulation for a specific match (stops and removes it)
+   */
+  public resetSimulation(matchId: string): boolean {
+    const simulation = this.simulations.get(matchId);
+
+    if (!simulation) {
+      console.log(`No simulation found for match ${matchId}`);
+      return false;
+    }
+
+    try {
+      // Stop the simulation completely
+      simulation.stopSimulation();
+      // Remove it from the map so it can be restarted fresh
+      this.simulations.delete(matchId);
+      // Delete the poll as well
+      this.pollManager.deletePoll(matchId);
+      console.log(
+        `Reset (stopped and removed) simulation for match ${matchId}`
+      );
+      return true;
+    } catch (error) {
+      console.error(`Failed to reset simulation for match ${matchId}:`, error);
       return false;
     }
   }
@@ -65,6 +141,8 @@ export class SimulationManager {
     try {
       simulation.stopSimulation();
       this.simulations.delete(matchId);
+      // End the poll when match ends
+      this.pollManager.endPoll(matchId);
       console.log(`Stopped simulation for match ${matchId}`);
       return true;
     } catch (error) {
@@ -103,6 +181,19 @@ export class SimulationManager {
     }
 
     return simulation.getMatchState();
+  }
+
+  /**
+   * Get past events for a running simulation
+   */
+  public getPastEvents(matchId: string) {
+    const simulation = this.simulations.get(matchId);
+
+    if (!simulation) {
+      return [];
+    }
+
+    return simulation.getPastEvents();
   }
 
   /**

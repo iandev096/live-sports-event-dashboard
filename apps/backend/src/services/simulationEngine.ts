@@ -17,6 +17,7 @@ export class MatchSimulationEngine {
   private gameClockInterval: NodeJS.Timeout | null = null;
   private isRunning: boolean = false;
   private processedEvents: Set<number> = new Set(); // Track processed events by minute
+  private pastEvents: MatchEvent[] = []; // Store all past events for late joiners
 
   constructor(
     matchId: string,
@@ -53,6 +54,7 @@ export class MatchSimulationEngine {
    */
   private loadTimeline(matchId: string): MatchTimeline {
     try {
+      // Try to load specific match timeline
       const timelinePath = path.join(
         __dirname,
         "../data/timelines",
@@ -61,15 +63,37 @@ export class MatchSimulationEngine {
       const timelineData = fs.readFileSync(timelinePath, "utf-8");
       return JSON.parse(timelineData);
     } catch (error) {
-      console.error(`Failed to load timeline for match ${matchId}:`, error);
-      // Return empty timeline as fallback
-      return {
-        matchId,
-        teamA: this.matchState.teamA,
-        teamB: this.matchState.teamB,
-        events: [],
-        duration: 90,
-      };
+      console.log(`No specific timeline for ${matchId}, trying default...`);
+
+      // Try to load default timeline
+      try {
+        const defaultTimelinePath = path.join(
+          __dirname,
+          "../data/timelines",
+          "manchester-united-vs-liverpool.json"
+        );
+        const timelineData = fs.readFileSync(defaultTimelinePath, "utf-8");
+        const timeline = JSON.parse(timelineData);
+
+        // Use the teams from the timeline, not the provided ones
+        this.matchState.teamA = timeline.teamA;
+        this.matchState.teamB = timeline.teamB;
+
+        console.log(
+          `✅ Loaded default timeline: ${timeline.teamA} vs ${timeline.teamB}`
+        );
+        return timeline;
+      } catch (defaultError) {
+        console.error(`Failed to load default timeline:`, defaultError);
+        // Return empty timeline as final fallback
+        return {
+          matchId,
+          teamA: this.matchState.teamA,
+          teamB: this.matchState.teamB,
+          events: [],
+          duration: 90,
+        };
+      }
     }
   }
 
@@ -107,7 +131,62 @@ export class MatchSimulationEngine {
   }
 
   /**
-   * Stop the match simulation
+   * Pause the match simulation (can be resumed)
+   */
+  public pauseSimulation(): void {
+    if (!this.isRunning) {
+      console.log(
+        `Simulation for match ${this.matchState.matchId} is not running`
+      );
+      return;
+    }
+
+    console.log(`Pausing simulation for match ${this.matchState.matchId}`);
+
+    this.isRunning = false;
+    this.matchState.isLive = false;
+
+    if (this.gameClockInterval) {
+      clearInterval(this.gameClockInterval);
+      this.gameClockInterval = null;
+    }
+
+    // Broadcast pause state
+    this.broadcastEvent({
+      type: "match-state",
+      matchId: this.matchState.matchId,
+      state: this.matchState,
+    });
+  }
+
+  /**
+   * Resume the match simulation from paused state
+   */
+  public resumeSimulation(): void {
+    if (this.isRunning) {
+      console.log(
+        `Simulation for match ${this.matchState.matchId} is already running`
+      );
+      return;
+    }
+
+    console.log(`Resuming simulation for match ${this.matchState.matchId}`);
+
+    this.matchState.isLive = true;
+
+    // Broadcast resume state
+    this.broadcastEvent({
+      type: "match-state",
+      matchId: this.matchState.matchId,
+      state: this.matchState,
+    });
+
+    // Restart game clock
+    this.startGameClock();
+  }
+
+  /**
+   * Stop the match simulation completely
    */
   public stopSimulation(): void {
     if (!this.isRunning) {
@@ -135,6 +214,41 @@ export class MatchSimulationEngine {
       matchId: this.matchState.matchId,
       currentTime: this.matchState.currentTime,
       phase: this.matchState.phase,
+    });
+  }
+
+  /**
+   * Reset the match simulation to initial state
+   */
+  public resetSimulation(): void {
+    console.log(`Resetting simulation for match ${this.matchState.matchId}`);
+
+    // Stop if running
+    if (this.isRunning) {
+      this.isRunning = false;
+      if (this.gameClockInterval) {
+        clearInterval(this.gameClockInterval);
+        this.gameClockInterval = null;
+      }
+    }
+
+    // Reset match state
+    this.matchState.currentTime = 0;
+    this.matchState.phase = "pre-match";
+    this.matchState.scoreA = 0;
+    this.matchState.scoreB = 0;
+    this.matchState.isLive = false;
+    this.matchState.startTime = new Date();
+    this.matchState.endTime = undefined;
+
+    // Clear processed events
+    this.processedEvents.clear();
+
+    // Broadcast reset state
+    this.broadcastEvent({
+      type: "match-state",
+      matchId: this.matchState.matchId,
+      state: this.matchState,
     });
   }
 
@@ -174,15 +288,13 @@ export class MatchSimulationEngine {
     // Process events for current time
     this.processEventsForCurrentTime();
 
-    // Broadcast time update every 5 minutes (or every 5 seconds in simulation)
-    if (Math.floor(this.matchState.currentTime) % 5 === 0) {
-      this.broadcastEvent({
-        type: "time-update",
-        matchId: this.matchState.matchId,
-        currentTime: Math.floor(this.matchState.currentTime),
-        phase: this.matchState.phase,
-      });
-    }
+    // Broadcast time update every second (includes fractional time for seconds)
+    this.broadcastEvent({
+      type: "time-update",
+      matchId: this.matchState.matchId,
+      currentTime: this.matchState.currentTime, // Send full decimal time (e.g., 5.25 = 5min 15sec)
+      phase: this.matchState.phase,
+    });
   }
 
   /**
@@ -228,6 +340,9 @@ export class MatchSimulationEngine {
    */
   private processEvent(event: MatchEvent): void {
     console.log(`[${event.minute}'] ${event.description}`);
+
+    // Store event in past events for late joiners
+    this.pastEvents.push(event);
 
     // Update match state based on event type
     switch (event.type) {
@@ -337,8 +452,8 @@ export class MatchSimulationEngine {
    * Broadcast event to all connected clients in the match room
    */
   private broadcastEvent(event: ServerMatchEvent): void {
-    const roomName = `match-${this.matchState.matchId}`;
-    this.io.to(roomName).emit("simulation-event", event);
+    // Use matchId directly as room name (no prefix)
+    this.io.to(this.matchState.matchId).emit("simulation-event", event);
   }
 
   /**
@@ -360,6 +475,13 @@ export class MatchSimulationEngine {
    */
   public getTimeline(): MatchTimeline {
     return { ...this.timeline };
+  }
+
+  /**
+   * Get past events (for late joiners)
+   */
+  public getPastEvents(): MatchEvent[] {
+    return [...this.pastEvents];
   }
 
   /**
