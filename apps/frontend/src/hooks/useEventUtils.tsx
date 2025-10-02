@@ -11,6 +11,7 @@ import {
   Users,
   Zap,
 } from "lucide-react";
+import type { TargetAndTransition, Transition } from "motion/react";
 
 export const useEventUtils = () => {
   const getEventIcon = (eventType: EventType) => {
@@ -135,6 +136,152 @@ export const useEventUtils = () => {
     return "";
   };
 
+  const getEventMotionProps = (
+    eventType: EventType
+  ): {
+    initial: TargetAndTransition;
+    animate: TargetAndTransition;
+    transition: Transition;
+  } => {
+    const initial: TargetAndTransition = {};
+    const animate: TargetAndTransition = {};
+    const transition: Transition = {
+      duration: 0.4,
+      ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
+    };
+
+    switch (eventType) {
+      case "goal":
+        // Subtle goal celebration: gentle bounce
+        Object.assign(initial, { opacity: 0, scale: 0.85, y: -15 });
+        Object.assign(animate, {
+          opacity: 1,
+          scale: [0.85, 1.05, 1], // Gentle overshoot
+          y: 0,
+        });
+        transition.duration = 0.5;
+        transition.ease = [0.34, 1.2, 0.64, 1] as [
+          number,
+          number,
+          number,
+          number
+        ];
+        break;
+
+      case "yellow-card":
+        // Subtle shake for yellow card
+        Object.assign(initial, { opacity: 0, x: -20, rotate: -3 });
+        Object.assign(animate, {
+          opacity: 1,
+          x: [0, -4, 4, -2, 0], // Gentler shake
+          rotate: 0,
+        });
+        transition.duration = 0.45;
+        transition.ease = [0.25, 0.46, 0.45, 0.94] as [
+          number,
+          number,
+          number,
+          number
+        ];
+        break;
+
+      case "red-card":
+        // More noticeable shake for red card but still controlled
+        Object.assign(initial, { opacity: 0, x: 20, scale: 0.9, rotate: 3 });
+        Object.assign(animate, {
+          opacity: [0, 1], // Remove flash
+          x: [0, -6, 6, -3, 3, 0], // Moderate shake
+          scale: [0.9, 1.03, 1], // Subtle impact
+          rotate: 0,
+        });
+        transition.duration = 0.55;
+        transition.ease = [0.25, 0.46, 0.45, 0.94] as [
+          number,
+          number,
+          number,
+          number
+        ];
+        break;
+
+      case "penalty":
+        // Special animation for penalty events
+        Object.assign(initial, { opacity: 0, scale: 0.9, y: -10 });
+        Object.assign(animate, {
+          opacity: 1,
+          scale: [0.9, 1.08, 1], // More pronounced bounce for penalties
+          y: 0,
+        });
+        transition.duration = 0.6;
+        transition.ease = [0.34, 1.2, 0.64, 1] as [
+          number,
+          number,
+          number,
+          number
+        ];
+        break;
+
+      case "penalties":
+        // Dramatic animation for penalty shootout
+        Object.assign(initial, { opacity: 0, scale: 0.8, y: -20, rotate: -5 });
+        Object.assign(animate, {
+          opacity: 1,
+          scale: [0.8, 1.1, 1], // Strong bounce
+          y: 0,
+          rotate: 0,
+        });
+        transition.duration = 0.7;
+        transition.ease = [0.34, 1.2, 0.64, 1] as [
+          number,
+          number,
+          number,
+          number
+        ];
+        break;
+
+      case "substitution":
+        // Smooth slide-in for substitutions
+        Object.assign(initial, { opacity: 0, x: -30, scale: 0.95 });
+        Object.assign(animate, {
+          opacity: 1,
+          x: 0,
+          scale: 1,
+        });
+        transition.duration = 0.4;
+        break;
+
+      case "shot":
+        // Quick pop for shots
+        Object.assign(initial, { opacity: 0, scale: 0.9, y: -10 });
+        Object.assign(animate, {
+          opacity: 1,
+          scale: [0.9, 1.02, 1], // Quick pop
+          y: 0,
+        });
+        transition.duration = 0.35;
+        break;
+
+      case "save":
+        // Defensive save animation
+        Object.assign(initial, { opacity: 0, scale: 0.95, y: 10 });
+        Object.assign(animate, {
+          opacity: 1,
+          scale: [0.95, 1.03, 1], // Subtle defensive pop
+          y: 0,
+        });
+        transition.duration = 0.4;
+        break;
+
+      default:
+        // Standard smooth animation for regular events
+        Object.assign(initial, { opacity: 0, y: -20, scale: 0.95 });
+        Object.assign(animate, { opacity: 1, y: 0, scale: 1 });
+        transition.duration = 0.4;
+        break;
+    }
+
+    return { initial, animate, transition };
+  };
+
   return {
     getEventIcon,
     getEventColor,
@@ -142,5 +289,6 @@ export const useEventUtils = () => {
     getEventTypeLabel,
     isImportantEvent,
     getEventAnimation,
+    getEventMotionProps,
   };
 };
