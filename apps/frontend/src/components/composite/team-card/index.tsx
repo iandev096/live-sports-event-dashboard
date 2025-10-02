@@ -11,9 +11,6 @@ type TeamCardProps = {
   className?: string;
 };
 
-// Create motion-enhanced Card
-const MotionCard = motion.create(Card);
-
 function TeamCard({
   teamName,
   teamLogo = "https://api.dicebear.com/7.x/identicon/svg?seed=Man",
@@ -27,49 +24,14 @@ function TeamCard({
   useEffect(() => {
     if (teamScore > prevScore) {
       setIsGoalAnimation(true);
-      setTimeout(() => setIsGoalAnimation(false), 4000); // Animation lasts 4 seconds
+      // Reset animation after 3 seconds
+      setTimeout(() => setIsGoalAnimation(false), 3000);
     }
     setPrevScore(teamScore);
   }, [teamScore, prevScore]);
 
   return (
-    <MotionCard
-      animate={
-        isGoalAnimation
-          ? {
-              borderColor: [
-                "transparent", // Start invisible
-                "rgb(134, 239, 172)", // green-300
-                "rgb(74, 222, 128)", // green-400
-                "rgb(34, 197, 94)", // green-500 (brightest)
-                "rgb(74, 222, 128)", // green-400
-                "rgb(134, 239, 172)", // green-300
-                "transparent", // Fade back to invisible
-              ],
-              borderWidth: [
-                "0px", // Start with no border
-                "2px",
-                "3px",
-                "4px", // Thickest at peak
-                "3px",
-                "2px",
-                "0px", // Back to no border
-              ],
-            }
-          : {
-              borderColor: "transparent",
-              borderWidth: "0px",
-            }
-      }
-      transition={
-        isGoalAnimation
-          ? {
-              duration: 4,
-              times: [0, 0.15, 0.3, 0.5, 0.7, 0.85, 1],
-              ease: "easeInOut",
-            }
-          : { duration: 0 }
-      }
+    <Card
       className={cn(
         "shadow-lg shadow-slate-200 dark:shadow-slate-800 @container",
         className
@@ -98,32 +60,22 @@ function TeamCard({
         <motion.div
           key={teamScore} // Re-render on score change
           id="score"
-          className="text-3xl @min-[220px]:text-4xl @min-[300px]:text-5xl font-bold"
-          initial={
-            isGoalAnimation
-              ? { scale: 0.5, opacity: 0, y: -20 }
-              : { scale: 1, opacity: 1, y: 0 }
-          }
+          className={cn(
+            "text-3xl @min-[220px]:text-4xl @min-[300px]:text-5xl font-bold",
+            isGoalAnimation && "text-green-500"
+          )}
           animate={
             isGoalAnimation
               ? {
-                  scale: [0.5, 1.3, 1],
-                  opacity: [0, 1, 1],
-                  y: [-20, 0, 0],
-                  color: [
-                    "rgb(34, 197, 94)", // green-500
-                    "rgb(34, 197, 94)",
-                    "currentColor",
-                  ],
+                  scale: [1, 1.2, 1],
                 }
-              : { scale: 1, opacity: 1, y: 0 }
+              : { scale: 1 }
           }
           transition={
             isGoalAnimation
               ? {
-                  duration: 0.8,
-                  times: [0, 0.6, 1],
-                  ease: [0.34, 1.56, 0.64, 1], // easeOutBack
+                  duration: 0.6,
+                  ease: [0.25, 0.46, 0.45, 0.94],
                 }
               : { duration: 0 }
           }
@@ -131,7 +83,7 @@ function TeamCard({
           {teamScore}
         </motion.div>
       </CardContent>
-    </MotionCard>
+    </Card>
   );
 }
 
