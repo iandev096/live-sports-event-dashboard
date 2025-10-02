@@ -10,6 +10,7 @@ interface SimulationFABProps {
   onReset?: () => void;
   onSettings?: () => void;
   className?: string;
+  disabled?: boolean;
 }
 
 export function SimulationFAB({
@@ -18,6 +19,7 @@ export function SimulationFAB({
   onReset,
   onSettings,
   className,
+  disabled = false,
 }: SimulationFABProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const ref = useClickAway<HTMLDivElement>(() => {
@@ -43,6 +45,11 @@ export function SimulationFAB({
     setIsExpanded(false);
   };
 
+  // Hide FAB completely in viewer mode (disabled state)
+  if (disabled) {
+    return null;
+  }
+
   return (
     <div className={cn("fixed bottom-4 left-4 z-50", className)} ref={ref}>
       {/* Expanded Menu */}
@@ -60,6 +67,7 @@ export function SimulationFAB({
           size="icon"
           className="h-12 w-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
           onClick={handlePlayPause}
+          disabled={disabled}
         >
           {isPlaying ? (
             <Pause className="h-5 w-5" />
@@ -74,6 +82,7 @@ export function SimulationFAB({
           size="icon"
           className="h-12 w-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
           onClick={handleReset}
+          disabled={disabled}
         >
           <RotateCw className="h-5 w-5" />
         </Button>
@@ -84,6 +93,7 @@ export function SimulationFAB({
           size="icon"
           className="h-12 w-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 dark:bg-slate-900/80 dark:hover:bg-slate-800"
           onClick={handleSettings}
+          disabled={disabled}
         >
           <Settings className="h-5 w-5" />
         </Button>
