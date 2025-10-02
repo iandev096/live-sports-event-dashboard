@@ -1,19 +1,54 @@
-import { matchEvents, teamAEvents, teamBEvents } from "@/mock/match-events";
+import { useSimulation } from "@/components/providers/simulation-provider";
 import { mockMatchTimeline } from "@/mock/match-timeline";
-import { mockPoll } from "@/mock/poll-data";
+import { useMemo } from "react";
 import ActivePoll from "../active-poll";
+import ConnectionStatus from "../connection-status";
 import EventsFeed from "../events-feed";
+import MatchInfoInline from "../match-info/inline";
 import { ModeToggle } from "../mode-toggle";
+import ShareSimulationButton from "../share-simulation-button";
 import SimulationControls from "../simulation-controls";
 import TeamCard from "../team-card";
 import TeamEvents from "../team-events";
+import ViewerModeBanner from "../viewer-mode-banner";
 
 function DesktopView() {
+  const { matchState, events, poll, hasVoted, userVote, votePoll } =
+    useSimulation();
+
+  // Get team names from match state or use mock data
+  const teamA = matchState?.teamA || mockMatchTimeline.teamA;
+  const teamB = matchState?.teamB || mockMatchTimeline.teamB;
+  const scoreA = matchState?.scoreA || 0;
+  const scoreB = matchState?.scoreB || 0;
+
+  // Filter events by team
+  const teamAEvents = useMemo(
+    () => events.filter((event) => event.team === "teamA"),
+    [events]
+  );
+
+  const teamBEvents = useMemo(
+    () => events.filter((event) => event.team === "teamB"),
+    [events]
+  );
+
+  const generalEvents = useMemo(
+    () => events.filter((event) => !event.team),
+    [events]
+  );
+
   return (
     <>
+      <ViewerModeBanner />
       <header className="flex justify-between items-center p-4 bg-white dark:bg-slate-950 rounded-lg">
-        <h1 className="text-2xl font-bold">Match Simulation Dashboard</h1>
-        <div id="mode-toggle" className="">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold">Match Simulation Dashboard</h1>
+          <ConnectionStatus />
+          <MatchInfoInline />
+        </div>
+        <div className="flex items-center gap-2">
+          <ShareSimulationButton />
           <ModeToggle />
         </div>
       </header>
@@ -27,27 +62,31 @@ function DesktopView() {
         >
           <section id="team-a" className="flex flex-col gap-4">
             <TeamCard
-              teamName={mockMatchTimeline.teamA}
-              teamScore={0}
-              teamLogo={`https://api.dicebear.com/7.x/identicon/svg?seed=${mockMatchTimeline.teamA}`}
+              teamName={teamA}
+              teamScore={scoreA}
+              teamLogo={`https://api.dicebear.com/7.x/identicon/svg?seed=${teamA}`}
             />
             <TeamEvents events={teamAEvents} className="flex-1" />
           </section>
           <section id="poll-general-commentary" className="flex flex-col gap-4">
-            <section id="poll">
-              <ActivePoll poll={mockPoll} />
-            </section>
+            {poll && (
+              <section id="poll">
+                <ActivePoll
+                  poll={poll}
+                  onVote={votePoll}
+                  hasVoted={hasVoted}
+                  userVote={userVote || undefined}
+                />
+              </section>
+            )}
             {/* general commentary */}
-            <EventsFeed
-              events={matchEvents.filter((event) => !event.team)}
-              className="flex-1"
-            />
+            <EventsFeed events={generalEvents} className="flex-1" />
           </section>
           <section id="team-b" className="flex flex-col gap-4">
             <TeamCard
-              teamName={mockMatchTimeline.teamB}
-              teamScore={0}
-              teamLogo={`https://api.dicebear.com/7.x/identicon/svg?seed=${mockMatchTimeline.teamB}`}
+              teamName={teamB}
+              teamScore={scoreB}
+              teamLogo={`https://api.dicebear.com/7.x/identicon/svg?seed=${teamB}`}
             />
             <TeamEvents events={teamBEvents} className="flex-1" />
           </section>

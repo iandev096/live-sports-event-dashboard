@@ -1,29 +1,63 @@
+import { useSimulation } from "@/components/providers/simulation-provider";
 import { mockMatchTimeline } from "@/mock/match-timeline";
-import { mockPoll } from "@/mock/poll-data";
 import type { MatchTimeline } from "@/types";
 import { useState } from "react";
+import ConnectionStatus from "../connection-status";
 import EventsFeed from "../events-feed";
+import MatchInfoInline from "../match-info/inline";
 import { MobileSettingsModal } from "../mobile-settings-modal";
 import { ModeToggle } from "../mode-toggle";
 import { PollDialog } from "../poll-dialog";
 import { PollFAB } from "../poll-fab";
 import { ScrollToTop } from "../scroll-to-top";
+import ShareSimulationButton from "../share-simulation-button";
 import { SimulationFAB } from "../simulation-fab";
 import TeamCard from "../team-card";
+import ViewerModeBanner from "../viewer-mode-banner";
 
 function MobileView() {
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isPollOpen, setIsPollOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
+  const {
+    matchState,
+    events,
+    isSimulationRunning,
+    isOwner,
+    startSimulation,
+    pauseSimulation,
+    resumeSimulation,
+    resetSimulation,
+    poll,
+    hasVoted,
+    userVote,
+    votePoll,
+  } = useSimulation();
+
+  // Get team names from match state or use mock data
+  const teamA = matchState?.teamA || mockMatchTimeline.teamA;
+  const teamB = matchState?.teamB || mockMatchTimeline.teamB;
+  const scoreA = matchState?.scoreA || 0;
+  const scoreB = matchState?.scoreB || 0;
+
   const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
-    console.log(isPlaying ? "Pausing simulation" : "Starting simulation");
+    if (!isOwner) return;
+
+    if (isSimulationRunning) {
+      // Pause if currently running
+      pauseSimulation();
+    } else if (matchState) {
+      // Resume if paused (matchState exists)
+      resumeSimulation();
+    } else {
+      // Start new simulation (no matchState = fresh start)
+      startSimulation(teamA, teamB);
+    }
   };
 
   const handleReset = () => {
-    setIsPlaying(false);
-    console.log("Resetting simulation");
+    if (!isOwner) return;
+    resetSimulation();
   };
 
   const handleSettings = () => {
@@ -32,7 +66,9 @@ function MobileView() {
 
   const handleSaveSettings = (timeline: MatchTimeline) => {
     console.log("Saving timeline:", timeline);
-    // TODO: Implement actual timeline saving logic
+    if (isOwner) {
+      startSimulation(timeline.teamA, timeline.teamB);
+    }
     setIsSettingsOpen(false);
   };
 
@@ -40,16 +76,23 @@ function MobileView() {
     setIsPollOpen(true);
   };
 
-  const handleVote = async (optionId: string) => {
-    console.log("Voting for option:", optionId);
-    // TODO: Implement actual voting logic
+  const handleVote = (optionId: string) => {
+    votePoll(optionId);
   };
 
   return (
     <>
+      <ViewerModeBanner />
       <header className="flex justify-between items-center p-4 bg-white dark:bg-slate-950 rounded-lg">
-        <h1 className="text-xl sm:text-2xl font-bold">Match Simulation</h1>
-        <div id="mode-toggle" className="">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-xl sm:text-2xl font-bold">Match Simulation</h1>
+          <div className="flex items-center gap-2">
+            <ConnectionStatus showText={false} />
+            <MatchInfoInline />
+          </div>
+        </div>
+        <div className="flex items-center gap-2 self-start">
+          <ShareSimulationButton size="sm" />
           <ModeToggle />
         </div>
       </header>
@@ -61,22 +104,22 @@ function MobileView() {
         >
           <section id="team-a-mobile">
             <TeamCard
-              teamName={mockMatchTimeline.teamA}
-              teamScore={0}
-              teamLogo={`https://api.dicebear.com/7.x/identicon/svg?seed=${mockMatchTimeline.teamA}`}
+              teamName={teamA}
+              teamScore={scoreA}
+              teamLogo={`https://api.dicebear.com/7.x/identicon/svg?seed=${teamA}`}
             />
           </section>
           <section id="team-b-mobile">
             <TeamCard
-              teamName={mockMatchTimeline.teamB}
-              teamScore={0}
-              teamLogo={`https://api.dicebear.com/7.x/identicon/svg?seed=${mockMatchTimeline.teamB}`}
+              teamName={teamB}
+              teamScore={scoreB}
+              teamLogo={`https://api.dicebear.com/7.x/identicon/svg?seed=${teamB}`}
             />
           </section>
         </section>
         <section id="commentary-mobile" className="z-1">
           <EventsFeed
-            events={mockMatchTimeline.events}
+            events={events}
             className="flex-1 h-auto"
             hideScrollIndicators
           />
@@ -85,25 +128,29 @@ function MobileView() {
 
       {/* Floating Action Buttons */}
       <SimulationFAB
-        isPlaying={isPlaying}
+        isPlaying={isSimulationRunning}
         onPlayPause={handlePlayPause}
         onReset={handleReset}
         onSettings={handleSettings}
+        disabled={!isOwner}
       />
 
-      <PollFAB onClick={handlePoll} />
+      {poll && <PollFAB onClick={handlePoll} />}
 
       {/* Scroll to Top Button */}
       <ScrollToTop threshold={200} />
 
       {/* Poll Dialog */}
-      <PollDialog
-        isOpen={isPollOpen}
-        onClose={() => setIsPollOpen(false)}
-        poll={mockPoll}
-        onVote={handleVote}
-        hasVoted={false}
-      />
+      {poll && (
+        <PollDialog
+          isOpen={isPollOpen}
+          onClose={() => setIsPollOpen(false)}
+          poll={poll}
+          onVote={handleVote}
+          hasVoted={hasVoted}
+          userVote={userVote || undefined}
+        />
+      )}
 
       {/* Settings Modal */}
       <MobileSettingsModal
