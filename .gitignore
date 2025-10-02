@@ -18,3 +18,5 @@ logs/
 .DS_Store
 .cursor/
 
+# ignore all md file that starts with __ (double underscore)
+__*.md
