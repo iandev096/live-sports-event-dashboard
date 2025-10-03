@@ -1,7 +1,9 @@
-import { useSimulation } from "@/components/providers/simulation-provider";
+import { useActions } from "@/components/providers/actions-provider";
+import { useEvents } from "@/components/providers/events-provider";
+import { useMatchState } from "@/components/providers/match-state-provider";
 import { mockMatchTimeline } from "@/mock/match-timeline";
 import type { MatchTimeline } from "@/types";
-import { useState } from "react";
+import { memo, useMemo, useState } from "react";
 import ConnectionStatus from "../connection-status";
 import EventsFeed from "../events-feed";
 import MatchInfoInline from "../match-info";
@@ -15,30 +17,37 @@ import { SimulationFAB } from "../simulation-fab";
 import TeamCard from "../team-card";
 import ViewerModeBanner from "../viewer-mode-banner";
 
-function MobileView() {
+const MobileView = memo(function MobileView() {
   const [isPollOpen, setIsPollOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
+  const { matchState, isSimulationRunning } = useMatchState();
+  const { events, poll, hasVoted, userVote } = useEvents();
   const {
-    matchState,
-    events,
-    isSimulationRunning,
     isOwner,
     startSimulation,
     pauseSimulation,
     resumeSimulation,
     resetSimulation,
-    poll,
-    hasVoted,
-    userVote,
     votePoll,
-  } = useSimulation();
+  } = useActions();
 
   // Get team names from match state or use mock data
   const teamA = matchState?.teamA || mockMatchTimeline.teamA;
   const teamB = matchState?.teamB || mockMatchTimeline.teamB;
   const scoreA = matchState?.scoreA || 0;
   const scoreB = matchState?.scoreB || 0;
+
+  // Memoize logo URLs to prevent TeamCard rerenders
+  const teamALogo = useMemo(
+    () => `https://api.dicebear.com/7.x/identicon/svg?seed=${teamA}`,
+    [teamA]
+  );
+
+  const teamBLogo = useMemo(
+    () => `https://api.dicebear.com/7.x/identicon/svg?seed=${teamB}`,
+    [teamB]
+  );
 
   const handlePlayPause = () => {
     if (!isOwner) return;
@@ -106,14 +115,14 @@ function MobileView() {
             <TeamCard
               teamName={teamA}
               teamScore={scoreA}
-              teamLogo={`https://api.dicebear.com/7.x/identicon/svg?seed=${teamA}`}
+              teamLogo={teamALogo}
             />
           </section>
           <section id="team-b-mobile">
             <TeamCard
               teamName={teamB}
               teamScore={scoreB}
-              teamLogo={`https://api.dicebear.com/7.x/identicon/svg?seed=${teamB}`}
+              teamLogo={teamBLogo}
             />
           </section>
         </section>
@@ -161,6 +170,6 @@ function MobileView() {
       />
     </>
   );
-}
+});
 
 export default MobileView;
