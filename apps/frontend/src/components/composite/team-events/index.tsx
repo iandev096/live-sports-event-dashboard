@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import type { MatchEvent } from "@/types";
 import { Activity } from "lucide-react";
 import { AnimatePresence } from "motion/react";
+import { memo, useMemo } from "react";
 import { TeamEventItem } from "./team-event-item";
 
 type TeamEventsProps = {
@@ -11,7 +12,13 @@ type TeamEventsProps = {
   className?: string;
 };
 
-function TeamEvents({ events, className }: TeamEventsProps) {
+function TeamEventsComponent({ events, className }: TeamEventsProps) {
+  // Memoize sorted events to prevent re-sorting on every render
+  const sortedEvents = useMemo(
+    () => [...events].sort((a, b) => b.minute - a.minute),
+    [events]
+  );
+
   if (events.length === 0) {
     return (
       <div className="h-[400px] w-full flex items-center justify-center">
@@ -34,14 +41,9 @@ function TeamEvents({ events, className }: TeamEventsProps) {
           <div className="sr-only">Scroll up to see more</div>
         </div>
         <AnimatePresence mode="popLayout">
-          {events
-            .sort((a, b) => b.minute - a.minute)
-            .map((event) => (
-              <TeamEvents.Item
-                key={event.minute + event.description}
-                {...event}
-              />
-            ))}
+          {sortedEvents.map((event) => (
+            <TeamEventItem key={event.minute + event.description} {...event} />
+          ))}
         </AnimatePresence>
         <div
           role="presentation"
@@ -54,6 +56,10 @@ function TeamEvents({ events, className }: TeamEventsProps) {
   );
 }
 
-TeamEvents.Item = TeamEventItem;
+const TeamEvents = memo(TeamEventsComponent);
 
-export default TeamEvents;
+// Attach Item as a static property
+(TeamEvents as typeof TeamEvents & { Item: typeof TeamEventItem }).Item =
+  TeamEventItem;
+
+export default TeamEvents as typeof TeamEvents & { Item: typeof TeamEventItem };
