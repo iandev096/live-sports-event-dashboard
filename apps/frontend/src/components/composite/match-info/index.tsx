@@ -1,13 +1,14 @@
-import { useSimulation } from "@/components/providers/simulation-provider";
+import { useMatchState } from "@/components/providers/match-state-provider";
 import { Badge } from "@/components/ui/badge";
 import { Clock } from "lucide-react";
 import { useEffect, useState } from "react";
 
 /**
  * Compact inline version of match info for header
+ * Only subscribes to matchState context - won't rerender when events change!
  */
 function MatchInfoInline() {
-  const { matchState, isSimulationRunning } = useSimulation();
+  const { matchState, isSimulationRunning } = useMatchState();
   const [displayTime, setDisplayTime] = useState(0);
 
   // Sync display time with match state
