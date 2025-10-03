@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
 type TeamCardProps = {
   teamName: string;
@@ -11,7 +11,7 @@ type TeamCardProps = {
   className?: string;
 };
 
-function TeamCard({
+const TeamCard = memo(function TeamCard({
   teamName,
   teamLogo = "https://api.dicebear.com/7.x/identicon/svg?seed=Man",
   teamScore,
@@ -85,6 +85,6 @@ function TeamCard({
       </CardContent>
     </Card>
   );
-}
+});
 
 export default TeamCard;
