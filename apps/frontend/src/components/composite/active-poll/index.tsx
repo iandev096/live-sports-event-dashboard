@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { type Poll, type PollOption } from "@/types";
-import { useState } from "react";
+import { memo, useState } from "react";
 import PollHeader from "./poll-header";
 import PollResults from "./poll-results";
 import VotingInterface from "./voting-interface";
@@ -12,7 +12,7 @@ type ActivePollProps = {
   userVote?: string;
 };
 
-function ActivePoll({
+const ActivePoll = memo(function ActivePoll({
   poll,
   onVote,
   hasVoted = false,
@@ -84,6 +84,6 @@ function ActivePoll({
       </CardContent>
     </Card>
   );
-}
+});
 
 export default ActivePoll;
