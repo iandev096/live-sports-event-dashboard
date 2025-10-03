@@ -1,15 +1,24 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { useEventUtils } from "@/hooks/useEventUtils";
+import {
+  getEventAnimation,
+  getEventBadgeVariant,
+  getEventColor,
+  getEventIcon,
+  getEventMotionProps,
+  getEventTypeLabel,
+  isImportantEvent,
+} from "@/lib/event-utils";
 import type { MatchEvent } from "@/types";
 import { motion } from "motion/react";
+import { memo } from "react";
 
 type TeamEventItemProps = {} & MatchEvent;
 
 // Create motion-enhanced Card component
 const MotionCard = motion.create(Card);
 
-function TeamEventItem({
+const TeamEventItem = memo(function TeamEventItem({
   description,
   minute,
   type,
@@ -17,16 +26,6 @@ function TeamEventItem({
   player,
   metadata,
 }: TeamEventItemProps) {
-  const {
-    getEventIcon,
-    getEventColor,
-    getEventBadgeVariant,
-    getEventTypeLabel,
-    isImportantEvent,
-    getEventAnimation,
-    getEventMotionProps,
-  } = useEventUtils();
-
   const { initial, animate, transition } = getEventMotionProps(type);
 
   return (
@@ -89,6 +88,6 @@ function TeamEventItem({
       </CardContent>
     </MotionCard>
   );
-}
+});
 
 export { TeamEventItem, type TeamEventItemProps };
