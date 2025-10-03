@@ -1,5 +1,5 @@
 import { getSocket, isSocketConnected } from "@/lib/socket";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Socket } from "socket.io-client";
 
 interface SocketContextType {
@@ -75,8 +75,14 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
     };
   }, [socket]);
 
+  // Memoize context value to prevent unnecessary rerenders
+  const contextValue = useMemo(
+    () => ({ socket, isConnected }),
+    [socket, isConnected]
+  );
+
   return (
-    <SocketContext.Provider value={{ socket, isConnected }}>
+    <SocketContext.Provider value={contextValue}>
       {children}
     </SocketContext.Provider>
   );
