@@ -1,4 +1,4 @@
-import { useSimulation } from "@/components/providers/simulation-provider";
+import { useActions } from "@/components/providers/actions-provider";
 import { Button } from "@/components/ui/button";
 import {
   clearMatchId,
@@ -10,9 +10,10 @@ import {
   setViewingMode,
 } from "@/lib/user-session";
 import { Eye, Home, Lock } from "lucide-react";
+import { memo } from "react";
 
-function ViewerModeBanner() {
-  const { isOwner, matchId, joinMatch } = useSimulation();
+const ViewerModeBanner = memo(function ViewerModeBanner() {
+  const { isOwner, matchId, joinMatch } = useActions();
 
   if (isOwner) return null;
 
@@ -84,6 +85,6 @@ function ViewerModeBanner() {
       </div>
     </div>
   );
-}
+});
 
 export default ViewerModeBanner;
