@@ -7,6 +7,11 @@ import timelineRoutes from "./timelineRoutes";
 export const setupRoutes = (app: Application) => {
   const API_BASE_URL = process.env.API_BASE_URL || "/api/v1";
 
+  // Redirect root to API
+  app.get("/", (req, res) => {
+    res.redirect(API_BASE_URL);
+  });
+
   // API Documentation endpoint
   app.get(API_BASE_URL, (req, res) => {
     res.json({
