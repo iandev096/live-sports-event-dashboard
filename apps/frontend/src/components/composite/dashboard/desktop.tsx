@@ -1,4 +1,6 @@
-import { useSimulation } from "@/components/providers/simulation-provider";
+import { useActions } from "@/components/providers/actions-provider";
+import { useEvents } from "@/components/providers/events-provider";
+import { useMatchState } from "@/components/providers/match-state-provider";
 import { mockMatchTimeline } from "@/mock/match-timeline";
 import { useMemo } from "react";
 import ActivePoll from "../active-poll";
@@ -13,8 +15,9 @@ import TeamEvents from "../team-events";
 import ViewerModeBanner from "../viewer-mode-banner";
 
 function DesktopView() {
-  const { matchState, events, poll, hasVoted, userVote, votePoll } =
-    useSimulation();
+  const { matchState } = useMatchState();
+  const { events, poll, hasVoted, userVote } = useEvents();
+  const { votePoll } = useActions();
 
   // Get team names from match state or use mock data
   const teamA = matchState?.teamA || mockMatchTimeline.teamA;
@@ -36,6 +39,17 @@ function DesktopView() {
   const generalEvents = useMemo(
     () => events.filter((event) => !event.team),
     [events]
+  );
+
+  // Memoize logo URLs to prevent TeamCard rerenders
+  const teamALogo = useMemo(
+    () => `https://api.dicebear.com/7.x/identicon/svg?seed=${teamA}`,
+    [teamA]
+  );
+
+  const teamBLogo = useMemo(
+    () => `https://api.dicebear.com/7.x/identicon/svg?seed=${teamB}`,
+    [teamB]
   );
 
   return (
@@ -64,7 +78,7 @@ function DesktopView() {
             <TeamCard
               teamName={teamA}
               teamScore={scoreA}
-              teamLogo={`https://api.dicebear.com/7.x/identicon/svg?seed=${teamA}`}
+              teamLogo={teamALogo}
             />
             <TeamEvents events={teamAEvents} className="flex-1" />
           </section>
@@ -86,7 +100,7 @@ function DesktopView() {
             <TeamCard
               teamName={teamB}
               teamScore={scoreB}
-              teamLogo={`https://api.dicebear.com/7.x/identicon/svg?seed=${teamB}`}
+              teamLogo={teamBLogo}
             />
             <TeamEvents events={teamBEvents} className="flex-1" />
           </section>
