@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd apps/frontend && pnpm build",
+  "outputDirectory": "apps/frontend/dist",
+  "installCommand": "pnpm install",
+  "framework": "vite",
+  "functions": {
+    "apps/frontend/src/**/*.ts": {
+      "runtime": "nodejs18.x"
+    }
+  }
+}
