@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import type { MatchEvent } from "@/types";
 import { MessageSquare } from "lucide-react";
 import { AnimatePresence } from "motion/react";
+import { memo, useMemo } from "react";
 import EventFeedItem from "./event-feed-item";
 
 type EventFeedProps = {
@@ -12,11 +13,17 @@ type EventFeedProps = {
   hideScrollIndicators?: boolean;
 };
 
-function EventsFeed({
+function EventsFeedComponent({
   events,
   className,
   hideScrollIndicators = false,
 }: EventFeedProps) {
+  // Memoize sorted events to prevent re-sorting on every render
+  const sortedEvents = useMemo(
+    () => [...events].sort((a, b) => b.minute - a.minute),
+    [events]
+  );
+
   if (events.length === 0) {
     return (
       <div className="h-[400px] w-full flex items-center justify-center">
@@ -41,14 +48,12 @@ function EventsFeed({
           </div>
         )}
         <AnimatePresence mode="popLayout">
-          {events
-            .sort((a, b) => b.minute - a.minute)
-            .map((event) => (
-              <EventsFeed.Item
-                key={event.minute + event.description}
-                event={event}
-              />
-            ))}
+          {sortedEvents.map((event) => (
+            <EventFeedItem
+              key={event.minute + event.description}
+              event={event}
+            />
+          ))}
         </AnimatePresence>
         {!hideScrollIndicators && (
           <div
@@ -63,6 +68,10 @@ function EventsFeed({
   );
 }
 
-EventsFeed.Item = EventFeedItem;
+const EventsFeed = memo(EventsFeedComponent);
 
-export default EventsFeed;
+// Attach Item as a static property
+(EventsFeed as typeof EventsFeed & { Item: typeof EventFeedItem }).Item =
+  EventFeedItem;
+
+export default EventsFeed as typeof EventsFeed & { Item: typeof EventFeedItem };
