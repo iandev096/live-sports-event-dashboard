@@ -1,8 +1,17 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { useEventUtils } from "@/hooks/useEventUtils";
+import {
+  getEventAnimation,
+  getEventBadgeVariant,
+  getEventColor,
+  getEventIcon,
+  getEventMotionProps,
+  getEventTypeLabel,
+  isImportantEvent,
+} from "@/lib/event-utils";
 import type { MatchEvent } from "@/types";
 import { motion } from "motion/react";
+import { memo } from "react";
 
 type EventFeedItemProps = {
   event: MatchEvent;
@@ -11,18 +20,10 @@ type EventFeedItemProps = {
 // Create motion-enhanced Card component
 const MotionCard = motion.create(Card);
 
-function EventFeedItem({ event }: EventFeedItemProps) {
+const EventFeedItem = memo(function EventFeedItem({
+  event,
+}: EventFeedItemProps) {
   const { description, minute, type, team, player, metadata } = event;
-
-  const {
-    getEventIcon,
-    getEventColor,
-    getEventBadgeVariant,
-    getEventTypeLabel,
-    isImportantEvent,
-    getEventAnimation,
-    getEventMotionProps,
-  } = useEventUtils();
 
   const { initial, animate, transition } = getEventMotionProps(type);
 
@@ -86,6 +87,6 @@ function EventFeedItem({ event }: EventFeedItemProps) {
       </CardContent>
     </MotionCard>
   );
-}
+});
 
 export default EventFeedItem;
