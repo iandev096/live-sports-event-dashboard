@@ -1,4 +1,4 @@
-import { useSimulation } from "@/components/providers/simulation-provider";
+import { useActions } from "@/components/providers/actions-provider";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,7 +22,7 @@ function ShareSimulationButton({
   size = "default",
   onCopySuccess,
 }: ShareSimulationButtonProps) {
-  const { isOwner, shareableUrl, copyShareLink } = useSimulation();
+  const { isOwner, shareableUrl, copyShareLink } = useActions();
   const [copied, setCopied] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
