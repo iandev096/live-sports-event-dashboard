@@ -1,4 +1,5 @@
-import { useSimulation } from "@/components/providers/simulation-provider";
+import { useActions } from "@/components/providers/actions-provider";
+import { useMatchState } from "@/components/providers/match-state-provider";
 import { Button } from "@/components/ui/button";
 import { mockMatchTimeline } from "@/mock/match-timeline";
 import type { MatchTimeline } from "@/types";
@@ -8,15 +9,14 @@ import { DesktopSettingsModal } from "../desktop-settings-modal";
 
 function SimulationControls() {
   const [isTimelineModalOpen, setIsTimelineModalOpen] = useState(false);
+  const { matchState, isSimulationRunning } = useMatchState();
   const {
-    isSimulationRunning,
     isOwner,
     startSimulation,
     pauseSimulation,
     resumeSimulation,
     resetSimulation,
-    matchState,
-  } = useSimulation();
+  } = useActions();
 
   const handlePlayPause = () => {
     if (!isOwner) return;
@@ -44,6 +44,14 @@ function SimulationControls() {
     if (isOwner) {
       startSimulation(timeline.teamA, timeline.teamB);
     }
+  };
+
+  const handleTimelineOpen = () => {
+    setIsTimelineModalOpen(true);
+  };
+
+  const handleTimelineClose = () => {
+    setIsTimelineModalOpen(false);
   };
 
   // Hide controls completely in viewer mode
@@ -77,7 +85,7 @@ function SimulationControls() {
         <Button
           variant="ghost"
           className="size-14"
-          onClick={() => setIsTimelineModalOpen(true)}
+          onClick={handleTimelineOpen}
           title="Settings"
         >
           <Settings className="size-6" />
@@ -86,7 +94,7 @@ function SimulationControls() {
 
       <DesktopSettingsModal
         isOpen={isTimelineModalOpen}
-        onClose={() => setIsTimelineModalOpen(false)}
+        onClose={handleTimelineClose}
         onSave={handleTimelineSave}
         initialTimeline={mockMatchTimeline}
       />
